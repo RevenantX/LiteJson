@@ -1,3 +1,4 @@
 *.userprefs
 LiteJSON/bin
 LiteJSON/obj
+*.suo

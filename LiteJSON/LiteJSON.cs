@@ -21,6 +21,17 @@ namespace LiteJSON
             return Parser.Parse(json);
         }
 
+        public static T Deserialize<T>(string json) where T : IJsonSerializable
+        {
+            if (json == null)
+            {
+                return default(T);
+            }
+            T result = Activator.CreateInstance<T>();
+            result.FromJson(Parser.Parse(json));
+            return result;
+        }
+
         /// <summary>
         /// Converts a IDictionary / IList object or a simple type (string, int, etc.) into a JSON string
         /// </summary>
@@ -31,9 +42,9 @@ namespace LiteJSON
             return Serializer.Serialize(obj);
         }
 
-        public static string Serialize<T>(T value)
+        public static string Serialize(IJsonSerializable jsonSerializable)
         {
-            return Serializer.Serialize(value);
+            return Serializer.Serialize(jsonSerializable.ToJson());
         }
     }
 }

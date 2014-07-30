@@ -1,24 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LiteJSON
 {
     class MainClass
     {
-        class Test
+        class Test : IJsonSerializable
         {
-            [JsonTypeInfoAttribute("float")]
             public float a;
-            public int b;
-            public Test c;
-            public string d { get; set; }
+            public string[] b;
+            public List<string> c;
+
+            public JsonObject ToJson()
+            {
+                JsonObject obj = new JsonObject();
+                obj.Put("a", a);
+                obj.Put("b", b);
+                obj.Put("c", c);
+                return obj;
+            }
+
+            public void FromJson(JsonObject jsonObject)
+            {
+                a = jsonObject.GetFloat("a");
+                b = jsonObject.GetArray<string>("b");
+                c = jsonObject.GetList<string>("c");
+            }
         }
 
         public static void Main(string[] args)
         {
-            string str = LiteJSON.Json.Serialize(new Test() {d="shit", c = new Test() {d="ass"} });
-            Console.WriteLine(str);
-            //JsonObject res = LiteJSON.Json.Deserialize(str);
-            //Console.WriteLine(res.Get<int>("ass"));
+            Test t1 = new Test();
+            t1.b = new[] {"avtobus", "pipiska"};
+            string text = Json.Serialize(t1);
+            Console.WriteLine(text);
+            Test t2 = Json.Deserialize<Test>(text);
+            Console.WriteLine(t2.b[0]);
+            Console.ReadKey();
         }
     }
 }

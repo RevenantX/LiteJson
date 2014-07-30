@@ -1,20 +1,22 @@
 ﻿using System;
-using System.IO;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace LiteJSON
 {
     sealed class Parser : IDisposable
     {
-        const string WORD_BREAK = "{}[],:\"";
+        const string WordBreak = "{}[],:\"";
 
         public static bool IsWordBreak(char c)
         {
-            return Char.IsWhiteSpace(c) || WORD_BREAK.IndexOf(c) != -1;
+            return Char.IsWhiteSpace(c) || WordBreak.IndexOf(c) != -1;
         }
 
-        enum TOKEN
+        enum Token
         {
             NONE,
             OPEN,
@@ -41,32 +43,16 @@ namespace LiteJSON
 
         public static JsonObject Parse(string jsonString)
         {
-            JsonObject jsonObject = null;
+            JsonObject jsonObject;
             using (var instance = new Parser(jsonString))
             {
-                TOKEN nextToken = instance.NextToken;
-                if (nextToken != TOKEN.CURLY_OPEN)
+                Token nextToken = instance.NextToken;
+                if (nextToken != Token.CURLY_OPEN)
                     throw new Exception("Bad json");
 
                 jsonObject = instance.ParseObject();
             }
             return jsonObject;
-        }
-
-        public static T Parse<T>(string jsonString)
-        {
-            T result = default(T);
-
-            using (var instance = new Parser(jsonString))
-            {
-                TOKEN nextToken = instance.NextToken;
-                if (nextToken != TOKEN.CURLY_OPEN)
-                    throw new Exception("Bad json");
-
-                result = instance.ParseClass<T>();
-            }
-
-            return result;
         }
 
         public void Dispose()
@@ -77,89 +63,36 @@ namespace LiteJSON
 
         private object ParseValue()
         {
-            TOKEN nextToken = NextToken;
+            Token nextToken = NextToken;
             return ParseByToken(nextToken);
         }
 
-        private object ParseByToken(TOKEN token)
+        private object ParseByToken(Token token)
         {
             switch (token)
             {
-                case TOKEN.STRING:
+                case Token.STRING:
                     return ParseString();
-                case TOKEN.NUMBER:
+                case Token.NUMBER:
                     return ParseNumber();
-                case TOKEN.CURLY_OPEN:
+                case Token.CURLY_OPEN:
                     return ParseObject();
-                case TOKEN.SQUARED_OPEN:
+                case Token.SQUARED_OPEN:
                     return ParseArray();
-                case TOKEN.TRUE:
+                case Token.TRUE:
                     return true;
-                case TOKEN.FALSE:
+                case Token.FALSE:
                     return false;
-                case TOKEN.NULL:
+                case Token.NULL:
                     return null;
                 default:
                     return null;
             }
         }
 
-        private T ParseClass<T>()
-        {
-            T result = Activator.CreateInstance<T>();
-            Type t = typeof(T);
-
-            _json.Read();
-            while (true)
-            {
-                switch (NextToken)
-                {
-                    case TOKEN.NONE:
-                        return default(T);
-                    case TOKEN.COMMA:
-                        continue;
-                    case TOKEN.CURLY_CLOSE:
-                        return result;
-                    default:
-                        string typeName = null;
-                        if (NextToken == TOKEN.OPEN)
-                        {
-                            typeName = ParseTypeName();
-                        }
-                        // name
-                        string name = ParseString();
-                        if (name == null)
-                        {
-                            return default(T);
-                        }
-
-                        // :
-                        if (NextToken != TOKEN.COLON)
-                        {
-                            return default(T);
-                        }
-                        // ditch the colon
-                        _json.Read();
-
-                        if (typeName != null)
-                        {
-                            object obj = Activator.CreateInstance(;
-                            t.GetField(name).SetValue(result, obj);
-                        }
-                        else
-                        {
-                            t.GetField(name).SetValue(result, obj);
-                        }
-                        // value
-                        //table.Put(name, ParseValue());
-                        break;
-                }
-            }
-        }
-
         private JsonObject ParseObject()
         {
-            JsonObject table = new JsonObject();
+            JsonObject jsonObject = new JsonObject();
 
             // ditch opening brace
             _json.Read();
@@ -169,13 +102,18 @@ namespace LiteJSON
             {
                 switch (NextToken)
                 {
-                    case TOKEN.NONE:
+                    case Token.NONE:
                         return null;
-                    case TOKEN.COMMA:
+                    case Token.COMMA:
                         continue;
-                    case TOKEN.CURLY_CLOSE:
-                        return table;
+                    case Token.CURLY_CLOSE:
+                        return jsonObject;
                     default:
+                        string typeName = null;
+                        if (NextToken == Token.OPEN)
+                        {
+                            typeName = ParseTypeName();
+                        }
                         // name
                         string name = ParseString();
                         if (name == null)
@@ -184,7 +122,7 @@ namespace LiteJSON
                         }
 
                         // :
-                        if (NextToken != TOKEN.COLON)
+                        if (NextToken != Token.COLON)
                         {
                             return null;
                         }
@@ -192,7 +130,7 @@ namespace LiteJSON
                         _json.Read();
 
                         // value
-                        table.Put(name, ParseValue());
+                        jsonObject.Put(name, ParseValue());
                         break;
                 }
             }
@@ -209,20 +147,19 @@ namespace LiteJSON
             var parsing = true;
             while (parsing)
             {
-                TOKEN nextToken = NextToken;
+                Token nextToken = NextToken;
 
                 switch (nextToken)
                 {
-                    case TOKEN.NONE:
+                    case Token.NONE:
                         return null;
-                    case TOKEN.COMMA:
+                    case Token.COMMA:
                         continue;
-                    case TOKEN.SQUARED_CLOSE:
+                    case Token.SQUARED_CLOSE:
                         parsing = false;
                         break;
                     default:
                         object value = ParseByToken(nextToken);
-
                         array.Add(value);
                         break;
                 }
@@ -242,10 +179,8 @@ namespace LiteJSON
             bool parsing = true;
             while (parsing)
             {
-
                 if (_json.Peek() == -1)
                 {
-                    parsing = false;
                     break;
                 }
 
@@ -259,9 +194,7 @@ namespace LiteJSON
                         if (_json.Peek() == -1)
                         {
                             parsing = false;
-                            break;
                         }
-                        c = NextChar;
                         break;
                     default:
                         s.Append(c);
@@ -283,10 +216,8 @@ namespace LiteJSON
             bool parsing = true;
             while (parsing)
             {
-
                 if (_json.Peek() == -1)
                 {
-                    parsing = false;
                     break;
                 }
 
@@ -418,7 +349,7 @@ namespace LiteJSON
             }
         }
 
-        private TOKEN NextToken
+        private Token NextToken
         {
             get
             {
@@ -426,32 +357,32 @@ namespace LiteJSON
 
                 if (_json.Peek() == -1)
                 {
-                    return TOKEN.NONE;
+                    return Token.NONE;
                 }
 
                 switch (PeekChar)
                 {
                     case '(':
-                        return TOKEN.OPEN;
+                        return Token.OPEN;
                     case ')':
-                        return TOKEN.CLOSE;
+                        return Token.CLOSE;
                     case '{':
-                        return TOKEN.CURLY_OPEN;
+                        return Token.CURLY_OPEN;
                     case '}':
                         _json.Read();
-                        return TOKEN.CURLY_CLOSE;
+                        return Token.CURLY_CLOSE;
                     case '[':
-                        return TOKEN.SQUARED_OPEN;
+                        return Token.SQUARED_OPEN;
                     case ']':
                         _json.Read();
-                        return TOKEN.SQUARED_CLOSE;
+                        return Token.SQUARED_CLOSE;
                     case ',':
                         _json.Read();
-                        return TOKEN.COMMA;
+                        return Token.COMMA;
                     case '"':
-                        return TOKEN.STRING;
+                        return Token.STRING;
                     case ':':
-                        return TOKEN.COLON;
+                        return Token.COLON;
                     case '0':
                     case '1':
                     case '2':
@@ -463,20 +394,20 @@ namespace LiteJSON
                     case '8':
                     case '9':
                     case '-':
-                        return TOKEN.NUMBER;
+                        return Token.NUMBER;
                 }
 
                 switch (NextWord)
                 {
                     case "false":
-                        return TOKEN.FALSE;
+                        return Token.FALSE;
                     case "true":
-                        return TOKEN.TRUE;
+                        return Token.TRUE;
                     case "null":
-                        return TOKEN.NULL;
+                        return Token.NULL;
                 }
 
-                return TOKEN.NONE;
+                return Token.NONE;
             }
         }
     }

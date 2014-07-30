@@ -1,31 +1,22 @@
 ﻿using System;
 using System.Text;
-using System.Collections;
-using System.Reflection;
 
 namespace LiteJSON
 {
     sealed class Serializer
     {
-        StringBuilder builder;
+        StringBuilder _builder;
 
         private Serializer()
         {
-            builder = new StringBuilder();
+            _builder = new StringBuilder();
         }
 
         public static string Serialize(JsonObject obj)
         {
             var instance = new Serializer();
             instance.SerializeObject(obj);
-            return instance.builder.ToString();
-        }
-
-        public static string Serialize<T>(T obj)
-        {
-            var instance = new Serializer();
-            instance.SerializeClass(obj, typeof(T));
-            return instance.builder.ToString();
+            return instance._builder.ToString();
         }
 
         private void SerializeValue(object value)
@@ -36,7 +27,7 @@ namespace LiteJSON
 
             if (value == null)
             {
-                builder.Append("null");
+                _builder.Append("null");
             }
             else if ((asStr = value as string) != null)
             {
@@ -44,7 +35,7 @@ namespace LiteJSON
             }
             else if (value is bool)
             {
-                builder.Append((bool)value ? "true" : "false");
+                _builder.Append((bool)value ? "true" : "false");
             }
             else if ((asList = value as JsonArray) != null)
             {
@@ -60,7 +51,7 @@ namespace LiteJSON
             }
             else if (value is float)
             {
-                builder.Append(((float)value).ToString("R"));
+                _builder.Append(((float)value).ToString("R"));
             }
             else if (value is int
                 || value is uint
@@ -71,12 +62,12 @@ namespace LiteJSON
                 || value is ushort
                 || value is ulong)
             {
-                builder.Append(value);
+                _builder.Append(value);
             }
             else if (value is double
                 || value is decimal)
             {
-                builder.Append(Convert.ToDouble(value).ToString("R"));
+                _builder.Append(Convert.ToDouble(value).ToString("R"));
             }
             else
             {
@@ -84,95 +75,33 @@ namespace LiteJSON
             }
         }
 
-        private void SerializeClass(object obj, Type t)
-        {
-            bool first = true;
-            builder.Append('{');
-
-            foreach (FieldInfo field in t.GetFields())
-            {
-                if (!first)
-                {
-                    builder.Append(',');
-                }
-
-                foreach (Attribute attr in field.GetCustomAttributes(true))
-                {
-                    JsonTypeInfoAttribute ti = attr as JsonTypeInfoAttribute;
-                    if (ti != null)
-                    {
-                        builder.Append("(" + ti.GetTypeInfo() + ")");
-                    }
-                }
-
-                SerializeString(field.Name);
-                builder.Append(':');
-
-                object fieldValue = field.GetValue(obj);
-                if (fieldValue != null && field.FieldType == t)
-                    SerializeClass(fieldValue, t);
-                else
-                    SerializeValue(fieldValue);
-                first = false;
-            }
-
-            foreach (PropertyInfo property in t.GetProperties())
-            {
-                if (!first)
-                {
-                    builder.Append(',');
-                }
-
-                foreach (Attribute attr in property.GetCustomAttributes(true))
-                {
-                    JsonTypeInfoAttribute ti = attr as JsonTypeInfoAttribute;
-                    if (ti != null)
-                    {
-                        builder.Append("(" + ti.GetTypeInfo() + ")");
-                    }
-                }
-
-                SerializeString(property.Name);
-                builder.Append(':');
-
-                object fieldValue = property.GetValue(obj,null);
-                if (fieldValue != null && property.PropertyType == t)
-                    SerializeClass(fieldValue, t);
-                else
-                    SerializeValue(fieldValue);
-                first = false;
-            }
-
-            builder.Append('}');
-        }
-
         private void SerializeObject(JsonObject obj)
         {
             bool first = true;
 
-            builder.Append('{');
+            _builder.Append('{');
 
             foreach (string e in obj.Keys)
             {
                 if (!first)
                 {
-                    builder.Append(',');
+                    _builder.Append(',');
                 }
 
-                SerializeString(e.ToString());
-                builder.Append(':');
+                SerializeString(e);
+                _builder.Append(':');
 
                 SerializeValue(obj.Get(e));
 
                 first = false;
             }
 
-            builder.Append('}');
+            _builder.Append('}');
         }
 
         private void SerializeArray(JsonArray anArray)
         {
-            builder.Append('[');
+            _builder.Append('[');
 
             bool first = true;
 
@@ -180,7 +109,7 @@ namespace LiteJSON
             {
                 if (!first)
                 {
-                    builder.Append(',');
+                    _builder.Append(',');
                 }
 
                 SerializeValue(obj);
@@ -188,12 +117,12 @@ namespace LiteJSON
                 first = false;
             }
 
-            builder.Append(']');
+            _builder.Append(']');
         }
 
         private void SerializeString(string str)
         {
-            builder.Append('\"');
+            _builder.Append('\"');
 
             char[] charArray = str.ToCharArray();
             foreach (var c in charArray)
@@ -201,42 +130,42 @@ namespace LiteJSON
                 switch (c)
                 {
                     case '"':
-                        builder.Append("\\\"");
+                        _builder.Append("\\\"");
                         break;
                     case '\\':
-                        builder.Append("\\\\");
+                        _builder.Append("\\\\");
                         break;
                     case '\b':
-                        builder.Append("\\b");
+                        _builder.Append("\\b");
                         break;
                     case '\f':
-                        builder.Append("\\f");
+                        _builder.Append("\\f");
                         break;
                     case '\n':
-                        builder.Append("\\n");
+                        _builder.Append("\\n");
                         break;
                     case '\r':
-                        builder.Append("\\r");
+                        _builder.Append("\\r");
                         break;
                     case '\t':
-                        builder.Append("\\t");
+                        _builder.Append("\\t");
                         break;
                     default:
                         int codepoint = Convert.ToInt32(c);
                         if ((codepoint >= 32) && (codepoint <= 126))
                         {
-                            builder.Append(c);
+                            _builder.Append(c);
                         }
                         else
                         {
-                            builder.Append("\\u");
-                            builder.Append(codepoint.ToString("x4"));
+                            _builder.Append("\\u");
+                            _builder.Append(codepoint.ToString("x4"));
                         }
                         break;
                 }
             }
 
-            builder.Append('\"');
+            _builder.Append('\"');
         }
     }
 }
