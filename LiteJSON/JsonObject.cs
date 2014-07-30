@@ -1,15 +1,27 @@
-﻿using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LiteJSON
 {
     public class JsonObject
     {
         private Dictionary<string, object> _dict;
+        private string _typeName;
 
         public JsonObject()
         {
             _dict = new Dictionary<string, object>();
+        }
+
+        public JsonObject(string typeName)
+        {
+            _dict = new Dictionary<string, object>();
+            _typeName = typeName;
+        }
+
+        public string TypeName
+        {
+            get { return _typeName; }
         }
 
         public void Put<T>(string key, T[] value)
@@ -43,7 +55,10 @@ namespace LiteJSON
             object obj = _dict[key];
             if (obj == null)
                 return default(T);
-            return (T)obj;
+
+            T jsonSerializable = Activator.CreateInstance<T>();
+            jsonSerializable.FromJson((JsonObject)obj);
+            return jsonSerializable;
         }
 
         public T[] GetArray<T>(string key)

@@ -15,7 +15,7 @@ namespace LiteJSON
             public float s = 1.3f;
             public JsonObject ToJson()
             {
-                JsonObject obj = new JsonObject();
+                JsonObject obj = new JsonObject("A");
                 obj.Put("s", s);
                 return obj;
             }
@@ -34,10 +34,10 @@ namespace LiteJSON
         class B : ISomeWhat
         {
             public string z = "sobachka";
-            public A someShto;
+            public A someShto = new A {s = 0.79f};
             public JsonObject ToJson()
             {
-                JsonObject obj = new JsonObject();
+                JsonObject obj = new JsonObject("B");
                 obj.Put("z", z);
                 obj.Put("someShto", someShto);
                 return obj;

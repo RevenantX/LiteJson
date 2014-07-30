@@ -14,12 +14,6 @@ namespace LiteJSON
             _builder = new StringBuilder();
         }
 
-        private Dictionary<string, Type> _types = new Dictionary<string, Type>();
-        public void RegisterType<T>(string name) where T : IJsonSerializable
-        {
-            _types.Add(name, typeof(T));
-        }
-
         public static string Serialize(JsonObject obj)
         {
             var instance = new JsonSerializer();
@@ -87,6 +81,13 @@ namespace LiteJSON
         {
             bool first = true;
 
+            if (!string.IsNullOrEmpty(obj.TypeName))
+            {
+                _builder.Append('(');
+                _builder.Append(obj.TypeName);
+                _builder.Append(')');
+            }
+
             _builder.Append('{');
 
             foreach (string e in obj.Keys)
@@ -95,18 +96,10 @@ namespace LiteJSON
                 {
                     _builder.Append(',');
                 }
-
-                object value = obj.Get(e);
-                IJsonSerializable jsonSerializable = value as IJsonSerializable;
-                if (jsonSerializable != null)
-                {
-                    Console.WriteLine(jsonSerializable.GetType());
-                }
-
                 SerializeString(e);
                 _builder.Append(':');
 
-                SerializeValue(value);
+                SerializeValue(obj.Get(e));
 
                 first = false;
             }

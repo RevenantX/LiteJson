@@ -60,7 +60,7 @@ namespace LiteJSON
                 if (nextToken != Token.CURLY_OPEN)
                     throw new Exception("Bad json");
 
-                jsonObject = ParseObject();
+                jsonObject = ParseObject(false);
             }
             return jsonObject;
         }
@@ -86,7 +86,9 @@ namespace LiteJSON
                 case Token.NUMBER:
                     return ParseNumber();
                 case Token.CURLY_OPEN:
-                    return ParseObject();
+                    return ParseObject(false);
+                case Token.OPEN:
+                    return ParseObject(true);
                 case Token.SQUARED_OPEN:
                     return ParseArray();
                 case Token.TRUE:
@@ -100,13 +102,18 @@ namespace LiteJSON
             }
         }
 
-        private JsonObject ParseObject()
+        private JsonObject ParseObject(bool withType)
         {
             JsonObject jsonObject = new JsonObject();
 
             // ditch opening brace
             _json.Read();
 
+            string typeName = null;
+            if (withType)
+            {
+                typeName = ParseTypeName();
+            }
             // {
             while (true)
             {
@@ -119,11 +126,6 @@ namespace LiteJSON
                     case Token.CURLY_CLOSE:
                         return jsonObject;
                     default:
-                        string typeName = null;
-                        if (NextToken == Token.OPEN)
-                        {
-                            typeName = ParseTypeName();
-                        }
                         // name
                         string name = ParseString();
                         if (name == null)
@@ -144,7 +146,7 @@ namespace LiteJSON
                         if (!string.IsNullOrEmpty(typeName) && _types.TryGetValue(typeName, out t))
                         {
                             IJsonSerializable obj = (IJsonSerializable)Activator.CreateInstance(t);
-                            obj.FromJson(ParseObject());
+                            obj.FromJson(ParseObject(false));
                             jsonObject.Put(name, obj);
                         }
                         else
