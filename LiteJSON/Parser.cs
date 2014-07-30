@@ -17,6 +17,8 @@ namespace LiteJSON
         enum TOKEN
         {
             NONE,
+            OPEN,
+            CLOSE,
             CURLY_OPEN,
             CURLY_CLOSE,
             SQUARED_OPEN,
@@ -27,15 +29,14 @@ namespace LiteJSON
             NUMBER,
             TRUE,
             FALSE,
-            NULL}
+            NULL
+        };
 
-        ;
+        private StringReader _json;
 
-        StringReader json;
-
-        Parser(string jsonString)
+        private Parser(string jsonString)
         {
-            json = new StringReader(jsonString);
+            _json = new StringReader(jsonString);
         }
 
         public static JsonObject Parse(string jsonString)
@@ -52,10 +53,26 @@ namespace LiteJSON
             return jsonObject;
         }
 
+        public static T Parse<T>(string jsonString)
+        {
+            T result = default(T);
+
+            using (var instance = new Parser(jsonString))
+            {
+                TOKEN nextToken = instance.NextToken;
+                if (nextToken != TOKEN.CURLY_OPEN)
+                    throw new Exception("Bad json");
+
+                result = instance.ParseClass<T>();
+            }
+
+            return result;
+        }
+
         public void Dispose()
         {
-            json.Dispose();
-            json = null;
+            _json.Dispose();
+            _json = null;
         }
 
         private object ParseValue()
@@ -87,12 +104,65 @@ namespace LiteJSON
             }
         }
 
-        JsonObject ParseObject()
+        private T ParseClass<T>()
+        {
+            T result = Activator.CreateInstance<T>();
+            Type t = typeof(T);
+
+            _json.Read();
+            while (true)
+            {
+                switch (NextToken)
+                {
+                    case TOKEN.NONE:
+                        return default(T);
+                    case TOKEN.COMMA:
+                        continue;
+                    case TOKEN.CURLY_CLOSE:
+                        return result;
+                    default:
+                        string typeName = null;
+                        if (NextToken == TOKEN.OPEN)
+                        {
+                            typeName = ParseTypeName();
+                        }
+                        // name
+                        string name = ParseString();
+                        if (name == null)
+                        {
+                            return default(T);
+                        }
+
+                        // :
+                        if (NextToken != TOKEN.COLON)
+                        {
+                            return default(T);
+                        }
+                        // ditch the colon
+                        _json.Read();
+
+                        if (typeName != null)
+                        {
+                            object obj = Activator.CreateInstance(;
+                            t.GetField(name).SetValue(result, obj);
+                        }
+                        else
+                        {
+                            t.GetField(name).SetValue(result, obj);
+                        }
+                        // value
+                        //table.Put(name, ParseValue());
+                        break;
+                }
+            }
+        }
+
+        private JsonObject ParseObject()
         {
             JsonObject table = new JsonObject();
 
             // ditch opening brace
-            json.Read();
+            _json.Read();
 
             // {
             while (true)
@@ -119,7 +189,7 @@ namespace LiteJSON
                             return null;
                         }
                         // ditch the colon
-                        json.Read();
+                        _json.Read();
 
                         // value
                         table.Put(name, ParseValue());
@@ -128,12 +198,12 @@ namespace LiteJSON
             }
         }
 
-        JsonArray ParseArray()
+        private JsonArray ParseArray()
         {
             JsonArray array = new JsonArray();
 
             // ditch opening bracket
-            json.Read();
+            _json.Read();
 
             // [
             var parsing = true;
@@ -161,19 +231,60 @@ namespace LiteJSON
             return array;
         }
 
+        private string ParseTypeName()
+        {
+            StringBuilder s = new StringBuilder();
+            char c;
+
+            // ditch opening '('
+            _json.Read();
+
+            bool parsing = true;
+            while (parsing)
+            {
+
+                if (_json.Peek() == -1)
+                {
+                    parsing = false;
+                    break;
+                }
+
+                c = NextChar;
+                switch (c)
+                {
+                    case ')':
+                        parsing = false;
+                        break;
+                    case '\\':
+                        if (_json.Peek() == -1)
+                        {
+                            parsing = false;
+                            break;
+                        }
+                        c = NextChar;
+                        break;
+                    default:
+                        s.Append(c);
+                        break;
+                }
+            }
+
+            return s.ToString();
+        }
+
         private string ParseString()
         {
             StringBuilder s = new StringBuilder();
             char c;
 
             // ditch opening quote
-            json.Read();
+            _json.Read();
 
             bool parsing = true;
             while (parsing)
             {
 
-                if (json.Peek() == -1)
+                if (_json.Peek() == -1)
                 {
                     parsing = false;
                     break;
@@ -186,7 +297,7 @@ namespace LiteJSON
                         parsing = false;
                         break;
                     case '\\':
-                        if (json.Peek() == -1)
+                        if (_json.Peek() == -1)
                         {
                             parsing = false;
                             break;
@@ -262,9 +373,9 @@ namespace LiteJSON
         {
             while (Char.IsWhiteSpace(PeekChar))
             {
-                json.Read();
+                _json.Read();
 
-                if (json.Peek() == -1)
+                if (_json.Peek() == -1)
                 {
                     break;
                 }
@@ -275,7 +386,7 @@ namespace LiteJSON
         {
             get
             {
-                return Convert.ToChar(json.Peek());
+                return Convert.ToChar(_json.Peek());
             }
         }
 
@@ -283,7 +394,7 @@ namespace LiteJSON
         {
             get
             {
-                return Convert.ToChar(json.Read());
+                return Convert.ToChar(_json.Read());
             }
         }
 
@@ -297,7 +408,7 @@ namespace LiteJSON
                 {
                     word.Append(NextChar);
 
-                    if (json.Peek() == -1)
+                    if (_json.Peek() == -1)
                     {
                         break;
                     }
@@ -313,25 +424,29 @@ namespace LiteJSON
             {
                 EatWhitespace();
 
-                if (json.Peek() == -1)
+                if (_json.Peek() == -1)
                 {
                     return TOKEN.NONE;
                 }
 
                 switch (PeekChar)
                 {
+                    case '(':
+                        return TOKEN.OPEN;
+                    case ')':
+                        return TOKEN.CLOSE;
                     case '{':
                         return TOKEN.CURLY_OPEN;
                     case '}':
-                        json.Read();
+                        _json.Read();
                         return TOKEN.CURLY_CLOSE;
                     case '[':
                         return TOKEN.SQUARED_OPEN;
                     case ']':
-                        json.Read();
+                        _json.Read();
                         return TOKEN.SQUARED_CLOSE;
                     case ',':
-                        json.Read();
+                        _json.Read();
                         return TOKEN.COMMA;
                     case '"':
                         return TOKEN.STRING;
