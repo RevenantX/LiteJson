@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
 
 namespace LiteJSON
 {
-    sealed class Parser : IDisposable
+    public sealed class JsonParser : IDisposable
     {
         const string WordBreak = "{}[],:\"";
 
@@ -36,21 +34,33 @@ namespace LiteJSON
 
         private StringReader _json;
 
-        private Parser(string jsonString)
+        private Dictionary<string, Type> _types = new Dictionary<string, Type>();  
+        public void RegisterType<T>(string name) where T : IJsonSerializable
         {
-            _json = new StringReader(jsonString);
+            _types.Add(name, typeof(T));
         }
 
-        public static JsonObject Parse(string jsonString)
+        public T Deserialize<T>(string jsonString) where T : IJsonSerializable
+        {
+            if (string.IsNullOrEmpty(jsonString))
+            {
+                return default(T);
+            }
+            T result = Activator.CreateInstance<T>();
+            result.FromJson(Parse(jsonString));
+            return result;
+        }
+
+        public JsonObject Parse(string jsonString)
         {
             JsonObject jsonObject;
-            using (var instance = new Parser(jsonString))
+            using (_json = new StringReader(jsonString))
             {
-                Token nextToken = instance.NextToken;
+                Token nextToken = NextToken;
                 if (nextToken != Token.CURLY_OPEN)
                     throw new Exception("Bad json");
 
-                jsonObject = instance.ParseObject();
+                jsonObject = ParseObject();
             }
             return jsonObject;
         }
@@ -130,7 +140,18 @@ namespace LiteJSON
                         _json.Read();
 
                         // value
-                        jsonObject.Put(name, ParseValue());
+                        Type t;
+                        if (!string.IsNullOrEmpty(typeName) && _types.TryGetValue(typeName, out t))
+                        {
+                            IJsonSerializable obj = (IJsonSerializable)Activator.CreateInstance(t);
+                            obj.FromJson(ParseObject());
+                            jsonObject.Put(name, obj);
+                        }
+                        else
+                        {
+                            jsonObject.Put(name, ParseValue());
+                        }
+                        
                         break;
                 }
             }

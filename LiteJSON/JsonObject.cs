@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace LiteJSON
 {
@@ -27,9 +28,22 @@ namespace LiteJSON
                 _dict.Add(key, JsonArray.FromList(value));
         }
 
+        public void Put(string key, IJsonSerializable value)
+        {
+            _dict.Add(key, value.ToJson());
+        }
+
         public void Put(string key, object value)
         {
             _dict.Add(key, value);
+        }
+
+        public T GetJsonSerializable<T>(string key) where T : IJsonSerializable
+        {
+            object obj = _dict[key];
+            if (obj == null)
+                return default(T);
+            return (T)obj;
         }
 
         public T[] GetArray<T>(string key)

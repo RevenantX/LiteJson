@@ -1,28 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace LiteJSON
 {
-    sealed class Serializer
+    public sealed class JsonSerializer
     {
         StringBuilder _builder;
 
-        private Serializer()
+        private JsonSerializer()
         {
             _builder = new StringBuilder();
         }
 
+        private Dictionary<string, Type> _types = new Dictionary<string, Type>();
+        public void RegisterType<T>(string name) where T : IJsonSerializable
+        {
+            _types.Add(name, typeof(T));
+        }
+
         public static string Serialize(JsonObject obj)
         {
-            var instance = new Serializer();
+            var instance = new JsonSerializer();
             instance.SerializeObject(obj);
             return instance._builder.ToString();
         }
 
         private void SerializeValue(object value)
         {
-            JsonArray asList;
-            JsonObject asDict;
+            JsonArray jsonArray;
+            JsonObject jsonObject;
             string asStr;
 
             if (value == null)
@@ -37,13 +45,13 @@ namespace LiteJSON
             {
                 _builder.Append((bool)value ? "true" : "false");
             }
-            else if ((asList = value as JsonArray) != null)
+            else if ((jsonArray = value as JsonArray) != null)
             {
-                SerializeArray(asList);
+                SerializeArray(jsonArray);
             }
-            else if ((asDict = value as JsonObject) != null)
+            else if ((jsonObject = value as JsonObject) != null)
             {
-                SerializeObject(asDict);
+                SerializeObject(jsonObject);
             }
             else if (value is char)
             {
@@ -51,7 +59,7 @@ namespace LiteJSON
             }
             else if (value is float)
             {
-                _builder.Append(((float)value).ToString("R"));
+                _builder.Append(((float)value).ToString("R", CultureInfo.CreateSpecificCulture("en-US").NumberFormat));
             }
             else if (value is int
                 || value is uint
@@ -67,7 +75,7 @@ namespace LiteJSON
             else if (value is double
                 || value is decimal)
             {
-                _builder.Append(Convert.ToDouble(value).ToString("R"));
+                _builder.Append(Convert.ToDouble(value).ToString("R", CultureInfo.CreateSpecificCulture("en-US").NumberFormat));
             }
             else
             {
@@ -88,10 +96,17 @@ namespace LiteJSON
                     _builder.Append(',');
                 }
 
+                object value = obj.Get(e);
+                IJsonSerializable jsonSerializable = value as IJsonSerializable;
+                if (jsonSerializable != null)
+                {
+                    Console.WriteLine(jsonSerializable.GetType());
+                }
+
                 SerializeString(e);
                 _builder.Append(':');
 
-                SerializeValue(obj.Get(e));
+                SerializeValue(value);
 
                 first = false;
             }

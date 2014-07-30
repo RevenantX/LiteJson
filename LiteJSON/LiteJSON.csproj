@@ -39,8 +39,8 @@
     <Compile Include="LiteJSON.cs" />
     <Compile Include="JsonArray.cs" />
     <Compile Include="JsonObject.cs" />
-    <Compile Include="Parser.cs" />
-    <Compile Include="Serializer.cs" />
+    <Compile Include="JsonParser.cs" />
+    <Compile Include="JsonSerializer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

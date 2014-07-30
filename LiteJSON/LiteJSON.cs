@@ -17,19 +17,13 @@ namespace LiteJSON
             {
                 return null;
             }
-
-            return Parser.Parse(json);
+            JsonParser parser = new JsonParser();
+            return parser.Parse(json);
         }
 
         public static T Deserialize<T>(string json) where T : IJsonSerializable
         {
-            if (json == null)
-            {
-                return default(T);
-            }
-            T result = Activator.CreateInstance<T>();
-            result.FromJson(Parser.Parse(json));
-            return result;
+            return new JsonParser().Deserialize<T>(json);
         }
 
         /// <summary>
@@ -39,12 +33,12 @@ namespace LiteJSON
         /// <returns>A JSON encoded string, or null if object 'json' is not serializable</returns>
         public static string Serialize(JsonObject obj)
         {
-            return Serializer.Serialize(obj);
+            return JsonSerializer.Serialize(obj);
         }
 
         public static string Serialize(IJsonSerializable jsonSerializable)
         {
-            return Serializer.Serialize(jsonSerializable.ToJson());
+            return JsonSerializer.Serialize(jsonSerializable.ToJson());
         }
     }
 }
