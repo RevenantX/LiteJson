@@ -17,8 +17,7 @@ namespace LiteJSON
             {
                 return null;
             }
-            JsonParser parser = new JsonParser();
-            return parser.Parse(json);
+            return new JsonParser().Parse(json);
         }
 
         public static T Deserialize<T>(string json) where T : IJsonSerializable

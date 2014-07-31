@@ -29,10 +29,13 @@ namespace LiteJSON
             NUMBER,
             TRUE,
             FALSE,
-            NULL
+            NULL,
+            WORD
         };
 
-        private StringReader _json;
+        //private StringReader _json;
+        private string _json;
+        private int _position;
 
         private Dictionary<string, Type> _types = new Dictionary<string, Type>();  
         public void RegisterType<T>(string name) where T : IJsonSerializable
@@ -53,28 +56,22 @@ namespace LiteJSON
 
         public JsonObject Parse(string jsonString)
         {
-            JsonObject jsonObject;
-            using (_json = new StringReader(jsonString))
-            {
-                Token nextToken = NextToken;
-                if (nextToken != Token.CURLY_OPEN)
-                    throw new Exception("Bad json");
-
-                jsonObject = ParseObject(false);
-            }
-            return jsonObject;
+            _json = jsonString;
+            _position = 0;
+            Token nextToken = NextToken();
+            if (nextToken != Token.CURLY_OPEN)
+                throw new Exception("Bad json");
+            return ParseObject(false);
         }
 
         public void Dispose()
         {
-            _json.Dispose();
             _json = null;
         }
 
         private object ParseValue()
         {
-            Token nextToken = NextToken;
-            return ParseByToken(nextToken);
+            return ParseByToken(NextToken());
         }
 
         private object ParseByToken(Token token)
@@ -122,37 +119,37 @@ namespace LiteJSON
             {
                 jsonObject = new JsonObject();
             }
-
+                
             // ditch opening brace
-            _json.Read();
+            SkipChar();
 
 
             // {
             while (true)
             {
-                switch (NextToken)
+                switch (NextToken())
                 {
                     case Token.NONE:
-                        return null;
+                        throw new Exception("None token");
                     case Token.COMMA:
                         continue;
                     case Token.CURLY_CLOSE:
                         return jsonObject;
                     default:
                         // name
-                        string name = ParseString();
+                        string name = ParseVariableName();
                         if (name == null)
                         {
-                            return null;
+                            throw new Exception("Empty variable name");
                         }
 
                         // :
-                        if (NextToken != Token.COLON)
+                        if (NextToken() != Token.COLON)
                         {
-                            return null;
+                            throw new Exception("Missing colon after variable name");
                         }
                         // ditch the colon
-                        _json.Read();
+                        SkipChar();
 
                         // value
                         jsonObject.Put(name, ParseValue());
@@ -167,13 +164,13 @@ namespace LiteJSON
             JsonArray array = new JsonArray();
 
             // ditch opening bracket
-            _json.Read();
+            SkipChar();
 
             // [
             var parsing = true;
             while (parsing)
             {
-                Token nextToken = NextToken;
+                Token nextToken = NextToken();
 
                 switch (nextToken)
                 {
@@ -200,24 +197,24 @@ namespace LiteJSON
             char c;
 
             // ditch opening '('
-            _json.Read();
+            SkipChar();
 
             bool parsing = true;
             while (parsing)
             {
-                if (_json.Peek() == -1)
+                if (IsEof())
                 {
                     break;
                 }
 
-                c = NextChar;
+                c = NextChar();
                 switch (c)
                 {
                     case ')':
                         parsing = false;
                         break;
                     case '\\':
-                        if (_json.Peek() == -1)
+                        if (IsEof())
                         {
                             parsing = false;
                         }
@@ -231,36 +228,65 @@ namespace LiteJSON
             return s.ToString();
         }
 
+        private string ParseVariableName()
+        {
+            char c = PeekChar();
+            if (c != '"')
+            {
+                StringBuilder s = new StringBuilder();
+                bool parsing = true;
+                while (parsing)
+                {
+                    if (IsEof())
+                    {
+                        break;
+                    }
+
+                    s.Append(NextChar());
+                    c = PeekChar();
+                    if (c == ':')
+                    {
+                        parsing = false;
+                    }
+                }
+                return s.ToString();
+            }
+            else
+            {
+                return ParseString();
+            }
+        }
+
         private string ParseString()
         {
             StringBuilder s = new StringBuilder();
             char c;
 
             // ditch opening quote
-            _json.Read();
+            SkipChar();
 
             bool parsing = true;
             while (parsing)
             {
-                if (_json.Peek() == -1)
+                if (IsEof())
                 {
                     break;
                 }
 
-                c = NextChar;
+                c = NextChar();
                 switch (c)
                 {
                     case '"':
                         parsing = false;
                         break;
                     case '\\':
-                        if (_json.Peek() == -1)
+                        if (IsEof())
                         {
                             parsing = false;
                             break;
                         }
 
-                        c = NextChar;
+                        c = NextChar();
                         switch (c)
                         {
                             case '"':
@@ -288,7 +314,7 @@ namespace LiteJSON
 
                                 for (int i = 0; i < 4; i++)
                                 {
-                                    hex[i] = NextChar;
+                                    hex[i] = NextChar();
                                 }
 
                                 s.Append((char)Convert.ToInt32(new string(hex), 16));
@@ -306,7 +332,7 @@ namespace LiteJSON
 
         private object ParseNumber()
         {
-            string number = NextWord;
+            string number = NextWord();
 
             if (number.IndexOf('.') == -1)
             {
@@ -328,113 +354,117 @@ namespace LiteJSON
 
         private void EatWhitespace()
         {
-            while (Char.IsWhiteSpace(PeekChar))
+            while (Char.IsWhiteSpace(PeekChar()))
             {
-                _json.Read();
+                SkipChar();
 
-                if (_json.Peek() == -1)
+                if (IsEof())
                 {
                     break;
                 }
             }
         }
 
-        private char PeekChar
+        private bool IsEof()
         {
-            get
-            {
-                return Convert.ToChar(_json.Peek());
-            }
+            return _position >= _json.Length;
         }
 
-        private char NextChar
+        private char PeekChar()
         {
-            get
-            {
-                return Convert.ToChar(_json.Read());
-            }
+            return _json[_position];
         }
 
-        private string NextWord
+        private char NextChar()
         {
-            get
-            {
-                StringBuilder word = new StringBuilder();
-
-                while (!IsWordBreak(PeekChar))
-                {
-                    word.Append(NextChar);
-
-                    if (_json.Peek() == -1)
-                    {
-                        break;
-                    }
-                }
-
-                return word.ToString();
-            }
+            char c = _json[_position];
+            _position++;
+            return c;
         }
 
-        private Token NextToken
+        private void SkipChar()
         {
-            get
+            _position++;
+        }
+
+        private string NextWord()
+        {
+            StringBuilder word = new StringBuilder();
+
+            while (!IsWordBreak(PeekChar()))
             {
-                EatWhitespace();
+                word.Append(NextChar());
 
-                if (_json.Peek() == -1)
+                if (IsEof())
                 {
-                    return Token.NONE;
+                    break;
                 }
+            }
 
-                switch (PeekChar)
-                {
-                    case '(':
-                        return Token.OPEN;
-                    case ')':
-                        return Token.CLOSE;
-                    case '{':
-                        return Token.CURLY_OPEN;
-                    case '}':
-                        _json.Read();
-                        return Token.CURLY_CLOSE;
-                    case '[':
-                        return Token.SQUARED_OPEN;
-                    case ']':
-                        _json.Read();
-                        return Token.SQUARED_CLOSE;
-                    case ',':
-                        _json.Read();
-                        return Token.COMMA;
-                    case '"':
-                        return Token.STRING;
-                    case ':':
-                        return Token.COLON;
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
-                    case '-':
-                        return Token.NUMBER;
-                }
+            return word.ToString();
+        }
 
-                switch (NextWord)
-                {
-                    case "false":
-                        return Token.FALSE;
-                    case "true":
-                        return Token.TRUE;
-                    case "null":
-                        return Token.NULL;
-                }
+        private Token NextToken()
+        {
+            EatWhitespace();
 
+            if (IsEof())
+            {
                 return Token.NONE;
             }
+
+            switch (PeekChar())
+            {
+                case '(':
+                    return Token.OPEN;
+                case ')':
+                    return Token.CLOSE;
+                case '{':
+                    return Token.CURLY_OPEN;
+                case '}':
+                    SkipChar();
+                    return Token.CURLY_CLOSE;
+                case '[':
+                    return Token.SQUARED_OPEN;
+                case ']':
+                    SkipChar();
+                    return Token.SQUARED_CLOSE;
+                case ',':
+                    SkipChar();
+                    return Token.COMMA;
+                case '"':
+                    return Token.STRING;
+                case ':':
+                    return Token.COLON;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                case '-':
+                    return Token.NUMBER;
+            }
+
+            string word = NextWord();
+            switch (word)
+            {
+                case "false":
+                    return Token.FALSE;
+                case "true":
+                    return Token.TRUE;
+                case "null":
+                    return Token.NULL;
+                default:
+                    _position -= word.Length;
+                    return Token.WORD;
+            }
+
+            return Token.NONE;
         }
     }
 }

@@ -80,8 +80,9 @@ namespace LiteJSON
 
         public static void Main(string[] args)
         {
+            //TEST1
             Test t1 = new Test();
-            t1.b = new[] {"avtobus", "pipiska"};
+            t1.b = new[] {"тест", "test2"};
             t1.c = new List<ISomeWhat>();
             t1.c.Add(new A());
             t1.c.Add(new B());
@@ -89,6 +90,7 @@ namespace LiteJSON
             string text = Json.Serialize(t1);
             Console.WriteLine(text);
 
+            //TEST2
             JsonParser p = new JsonParser();
             p.RegisterType<A>("A");
             p.RegisterType<B>("B");
@@ -97,6 +99,15 @@ namespace LiteJSON
             Test t2 = p.Deserialize<Test>(text);
             t2.c[0].Write();
             t2.c[1].Write();
+
+            //TEST3
+            string jtext = "{ kalabanga: 5, b: \"Тестовая Строка\", c: \"TestString\" }";
+            JsonObject jo = Json.Deserialize(jtext);
+            Console.WriteLine(jo.GetString("b"));
+            Console.WriteLine(jo.GetString("c"));
+
+            Console.WriteLine("Must be: Тестовая строка");
+
             Console.ReadKey();
         }
     }

@@ -132,8 +132,7 @@ namespace LiteJSON
         {
             _builder.Append('\"');
 
-            char[] charArray = str.ToCharArray();
-            foreach (var c in charArray)
+            foreach (var c in str)
             {
                 switch (c)
                 {
@@ -159,16 +158,7 @@ namespace LiteJSON
                         _builder.Append("\\t");
                         break;
                     default:
-                        int codepoint = Convert.ToInt32(c);
-                        if ((codepoint >= 32) && (codepoint <= 126))
-                        {
-                            _builder.Append(c);
-                        }
-                        else
-                        {
-                            _builder.Append("\\u");
-                            _builder.Append(codepoint.ToString("x4"));
-                        }
+                        _builder.Append(c);
                         break;
                 }
             }
