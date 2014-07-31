@@ -7,6 +7,7 @@ namespace LiteJSON
     {
         private Dictionary<string, object> _dict;
         private string _typeName;
+        private Type _type;
 
         public JsonObject()
         {
@@ -19,9 +20,20 @@ namespace LiteJSON
             _typeName = typeName;
         }
 
+        public JsonObject(Type type)
+        {
+            _dict = new Dictionary<string, object>();
+            _type = type;
+        }
+
         public string TypeName
         {
             get { return _typeName; }
+        }
+
+        public Type Type
+        {
+            get { return _type; }
         }
 
         public void Put<T>(string key, T[] value)
@@ -50,31 +62,20 @@ namespace LiteJSON
             _dict.Add(key, value);
         }
 
-        public T GetJsonSerializable<T>(string key) where T : IJsonSerializable
+        public T Deserialize<T>(string key) where T : IJsonSerializable
         {
+            if (_type == null)
+            {
+                throw new Exception("This object does not have type");
+            }
+
             object obj = _dict[key];
             if (obj == null)
                 return default(T);
 
-            T jsonSerializable = Activator.CreateInstance<T>();
+            T jsonSerializable = (T)Activator.CreateInstance(_type);
             jsonSerializable.FromJson((JsonObject)obj);
             return jsonSerializable;
-        }
-
-        public T[] GetArray<T>(string key)
-        {
-            object obj = _dict[key];
-            if(obj == null)
-                return null;
-            return ((JsonArray)obj).ToArray<T>();
-        }
-
-        public List<T> GetList<T>(string key)
-        {
-            object obj = _dict[key];
-            if (obj == null)
-                return null;
-            return ((JsonArray)obj).ToList<T>();            
         }
 
         public object Get(string key)
@@ -85,6 +86,11 @@ namespace LiteJSON
         public JsonObject GetJsonObject(string key)
         {
             return (JsonObject)_dict[key];
+        }
+
+        public JsonArray GetJsonArray(string key)
+        {
+            return (JsonArray)_dict[key];
         }
 
         public int OptInt(string key, int defaultValue)

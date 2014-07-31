@@ -104,16 +104,29 @@ namespace LiteJSON
 
         private JsonObject ParseObject(bool withType)
         {
-            JsonObject jsonObject = new JsonObject();
+            JsonObject jsonObject = null;
+            if (withType)
+            {
+                string typeName = ParseTypeName();
+                Type t;
+                if (!string.IsNullOrEmpty(typeName) && _types.TryGetValue(typeName, out t))
+                {
+                    jsonObject = new JsonObject(t);
+                }
+                else
+                {
+                    throw new Exception("Unregistered type: " + typeName);
+                }
+            }
+            else
+            {
+                jsonObject = new JsonObject();
+            }
 
             // ditch opening brace
             _json.Read();
 
-            string typeName = null;
-            if (withType)
-            {
-                typeName = ParseTypeName();
-            }
+
             // {
             while (true)
             {
@@ -142,17 +155,7 @@ namespace LiteJSON
                         _json.Read();
 
                         // value
-                        Type t;
-                        if (!string.IsNullOrEmpty(typeName) && _types.TryGetValue(typeName, out t))
-                        {
-                            IJsonSerializable obj = (IJsonSerializable)Activator.CreateInstance(t);
-                            obj.FromJson(ParseObject(false));
-                            jsonObject.Put(name, obj);
-                        }
-                        else
-                        {
-                            jsonObject.Put(name, ParseValue());
-                        }
+                        jsonObject.Put(name, ParseValue());
                         
                         break;
                 }

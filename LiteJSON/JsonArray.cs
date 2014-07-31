@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
+using System;
 
 namespace LiteJSON
 {
@@ -64,22 +65,42 @@ namespace LiteJSON
 
         public List<T> ToList<T>()
         {
+            bool deserialize = typeof(IJsonSerializable).IsAssignableFrom(typeof(T));
             int count = _list.Count;
             List<T> result = new List<T>(count);
             for (int i = 0; i < count; i++)
             {
-                result.Add((T)_list[i]);
+                if(deserialize)
+                {
+                    JsonObject jsonObject = (JsonObject)_list[i];
+                    T instance = (T)Activator.CreateInstance(jsonObject.Type);
+                    result.Add(instance);
+                }
+                else
+                {
+                    result.Add((T)_list[i]);
+                }
             }
             return result;
         }
 
         public T[] ToArray<T>()
         {
+            bool deserialize = typeof(IJsonSerializable).IsAssignableFrom(typeof(T));
             int count = _list.Count;
             T[] result = new T[count];
             for (int i = 0; i < count; i++)
             {
-                result[i] = (T)_list[i];
+                if(deserialize)
+                {
+                    JsonObject jsonObject = (JsonObject)_list[i];
+                    T instance = (T)Activator.CreateInstance(jsonObject.Type);
+                    result[i] = instance;
+                }
+                else
+                {
+                    result[i] = (T)_list[i];
+                }
             }
             return result; 
         }

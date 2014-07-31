@@ -46,7 +46,7 @@ namespace LiteJSON
             public void FromJson(JsonObject jsonObject)
             {
                 z = jsonObject.GetString("z");
-                someShto = jsonObject.GetJsonSerializable<A>("someShto");
+                someShto = jsonObject.Deserialize<A>("someShto");
             }
 
             public void Write()
@@ -73,8 +73,8 @@ namespace LiteJSON
             public void FromJson(JsonObject jsonObject)
             {
                 a = jsonObject.GetFloat("a");
-                b = jsonObject.GetArray<string>("b");
-                c = jsonObject.GetList<ISomeWhat>("c");
+                b = jsonObject.GetJsonArray("b").ToArray<string>();
+                c = jsonObject.GetJsonArray("c").ToList<ISomeWhat>();
             }
         }
 
@@ -85,6 +85,7 @@ namespace LiteJSON
             t1.c = new List<ISomeWhat>();
             t1.c.Add(new A());
             t1.c.Add(new B());
+            Console.WriteLine("Converting to json...");
             string text = Json.Serialize(t1);
             Console.WriteLine(text);
 
@@ -92,6 +93,7 @@ namespace LiteJSON
             p.RegisterType<A>("A");
             p.RegisterType<B>("B");
 
+            Console.WriteLine("Deserializing");
             Test t2 = p.Deserialize<Test>(text);
             t2.c[0].Write();
             t2.c[1].Write();
