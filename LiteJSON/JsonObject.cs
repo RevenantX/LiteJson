@@ -52,7 +52,7 @@ namespace LiteJSON
                 _dict.Add(key, JsonArray.FromList(value));
         }
 
-        public void Put(string key, IJsonSerializable value)
+        public void Put(string key, IJsonDeserializable value)
         {
             _dict.Add(key, value.ToJson());
         }

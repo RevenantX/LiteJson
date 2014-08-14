@@ -22,11 +22,11 @@ namespace LiteJSON
         {
             int count = list.Count;
             JsonArray result = new JsonArray(count);
-            bool serialize = typeof (IJsonSerializable).IsAssignableFrom(typeof (T));
+            bool serialize = typeof (IJsonDeserializable).IsAssignableFrom(typeof (T));
             for (int i = 0; i < count; i++)
             {
                 if (serialize)
-                    result._list.Add(((IJsonSerializable)list[i]).ToJson());
+                    result._list.Add(((IJsonDeserializable)list[i]).ToJson());
                 else
                     result._list.Add(list[i]);
             }
@@ -37,11 +37,11 @@ namespace LiteJSON
         {
             int count = array.Length;
             JsonArray result = new JsonArray(count);
-            bool serialize = typeof(IJsonSerializable).IsAssignableFrom(typeof(T));
+            bool serialize = typeof(IJsonDeserializable).IsAssignableFrom(typeof(T));
             for (int i = 0; i < count; i++)
             {
                 if (serialize)
-                    result._list.Add(((IJsonSerializable)array[i]).ToJson());
+                    result._list.Add(((IJsonDeserializable)array[i]).ToJson());
                 else
                     result._list.Add(array[i]);
             }

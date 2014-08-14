@@ -35,7 +35,7 @@ namespace LiteJSON
             return JsonSerializer.Serialize(obj);
         }
 
-        public static string Serialize(IJsonSerializable jsonSerializable)
+        public static string Serialize(IJsonDeserializable jsonSerializable)
         {
             return JsonSerializer.Serialize(jsonSerializable.ToJson());
         }

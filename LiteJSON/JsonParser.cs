@@ -463,8 +463,6 @@ namespace LiteJSON
                     _position -= word.Length;
                     return Token.WORD;
             }
-
-            return Token.NONE;
         }
     }
 }
