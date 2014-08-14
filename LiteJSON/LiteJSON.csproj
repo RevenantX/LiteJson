@@ -32,6 +32,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IJsonDeserializable.cs" />
     <Compile Include="IJsonSerializable.cs" />
     <Compile Include="JsonValue.cs" />
     <Compile Include="Program.cs" />

@@ -5,7 +5,7 @@ namespace LiteJSON
 {
     class MainClass
     {
-        interface ISomeWhat : IJsonSerializable
+        interface ISomeWhat : IJsonSerializable, IJsonDeserializable
         {
             void Write();
         }
@@ -55,7 +55,7 @@ namespace LiteJSON
             }
         }
 
-        class Test : IJsonSerializable
+        class Test : IJsonSerializable, IJsonDeserializable
         {
             public float a;
             public string[] b;
