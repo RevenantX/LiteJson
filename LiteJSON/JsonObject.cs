@@ -52,7 +52,7 @@ namespace LiteJSON
                 _dict.Add(key, JsonArray.FromList(value));
         }
 
-        public void Put(string key, IJsonDeserializable value)
+        public void Put(string key, IJsonSerializable value)
         {
             _dict.Add(key, value.ToJson());
         }
@@ -62,19 +62,27 @@ namespace LiteJSON
             _dict.Add(key, value);
         }
 
-        public T Deserialize<T>(string key) where T : IJsonSerializable
+        public T Deserialize<T>() where T : IJsonDeserializable
         {
             if (_type == null)
             {
                 throw new Exception("This object does not have type");
             }
 
-            object obj = _dict[key];
-            if (obj == null)
-                return default(T);
-
             T jsonSerializable = (T)Activator.CreateInstance(_type);
-            jsonSerializable.FromJson((JsonObject)obj);
+            jsonSerializable.FromJson(this);
+            return jsonSerializable;
+        }
+
+        public object Deserialize()
+        {
+            if (_type == null)
+            {
+                throw new Exception("This object does not have type");
+            }
+
+            IJsonDeserializable jsonSerializable = (IJsonDeserializable)Activator.CreateInstance(_type);
+            jsonSerializable.FromJson(this);
             return jsonSerializable;
         }
 
@@ -190,6 +198,11 @@ namespace LiteJSON
         public Dictionary<string, object>.KeyCollection Keys
         {
             get { return _dict.Keys; }
+        }
+
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
         }
     }
 }

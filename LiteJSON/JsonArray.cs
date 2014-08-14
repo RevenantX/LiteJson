@@ -22,11 +22,11 @@ namespace LiteJSON
         {
             int count = list.Count;
             JsonArray result = new JsonArray(count);
-            bool serialize = typeof (IJsonDeserializable).IsAssignableFrom(typeof (T));
+            bool serialize = typeof(IJsonSerializable).IsAssignableFrom(typeof(T));
             for (int i = 0; i < count; i++)
             {
                 if (serialize)
-                    result._list.Add(((IJsonDeserializable)list[i]).ToJson());
+                    result._list.Add(((IJsonSerializable)list[i]).ToJson());
                 else
                     result._list.Add(list[i]);
             }
@@ -37,11 +37,14 @@ namespace LiteJSON
         {
             int count = array.Length;
             JsonArray result = new JsonArray(count);
-            bool serialize = typeof(IJsonDeserializable).IsAssignableFrom(typeof(T));
+            bool serialize = typeof(IJsonSerializable).IsAssignableFrom(typeof(T));
             for (int i = 0; i < count; i++)
             {
                 if (serialize)
-                    result._list.Add(((IJsonDeserializable)array[i]).ToJson());
+                {
+                    IJsonSerializable srz = (IJsonSerializable)array[i];
+                    result._list.Add(srz.ToJson());
+                }
                 else
                     result._list.Add(array[i]);
             }
@@ -65,7 +68,7 @@ namespace LiteJSON
 
         public List<T> ToList<T>()
         {
-            bool deserialize = typeof(IJsonSerializable).IsAssignableFrom(typeof(T));
+            bool deserialize = typeof(IJsonDeserializable).IsAssignableFrom(typeof(T));
             int count = _list.Count;
             List<T> result = new List<T>(count);
             for (int i = 0; i < count; i++)
@@ -73,8 +76,7 @@ namespace LiteJSON
                 if(deserialize)
                 {
                     JsonObject jsonObject = (JsonObject)_list[i];
-                    T instance = (T)Activator.CreateInstance(jsonObject.Type);
-                    result.Add(instance);
+                    result.Add((T)jsonObject.Deserialize());
                 }
                 else
                 {
@@ -86,7 +88,7 @@ namespace LiteJSON
 
         public T[] ToArray<T>()
         {
-            bool deserialize = typeof(IJsonSerializable).IsAssignableFrom(typeof(T));
+            bool deserialize = typeof(IJsonDeserializable).IsAssignableFrom(typeof(T));
             int count = _list.Count;
             T[] result = new T[count];
             for (int i = 0; i < count; i++)
@@ -94,8 +96,7 @@ namespace LiteJSON
                 if(deserialize)
                 {
                     JsonObject jsonObject = (JsonObject)_list[i];
-                    T instance = (T)Activator.CreateInstance(jsonObject.Type);
-                    result[i] = instance;
+                    result[i] = (T)jsonObject.Deserialize();
                 }
                 else
                 {

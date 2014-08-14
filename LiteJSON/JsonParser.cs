@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Globalization;
 using System.Text;
 
 namespace LiteJSON
@@ -37,13 +37,13 @@ namespace LiteJSON
         private string _json;
         private int _position;
 
-        private Dictionary<string, Type> _types = new Dictionary<string, Type>();  
-        public void RegisterType<T>(string name) where T : IJsonSerializable
+        private Dictionary<string, Type> _types = new Dictionary<string, Type>();
+        public void RegisterType<T>(string name) where T : IJsonDeserializable
         {
             _types.Add(name, typeof(T));
         }
 
-        public T Deserialize<T>(string jsonString) where T : IJsonSerializable
+        public T Deserialize<T>(string jsonString) where T : IJsonDeserializable
         {
             if (string.IsNullOrEmpty(jsonString))
             {
@@ -345,7 +345,7 @@ namespace LiteJSON
             }
 
             double parsedDouble;
-            Double.TryParse(number, out parsedDouble);
+            Double.TryParse(number, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US").NumberFormat, out parsedDouble);
             if (parsedDouble <= float.MaxValue || parsedDouble >= float.MinValue)
                 return (float)parsedDouble;
             else

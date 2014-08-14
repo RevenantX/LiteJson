@@ -12,7 +12,8 @@ namespace LiteJSON
 
         class A : ISomeWhat
         {
-            public float s = 1.3f;
+            public float s;
+
             public JsonObject ToJson()
             {
                 JsonObject obj = new JsonObject("A");
@@ -46,7 +47,7 @@ namespace LiteJSON
             public void FromJson(JsonObject jsonObject)
             {
                 z = jsonObject.GetString("z");
-                someShto = jsonObject.Deserialize<A>("someShto");
+                someShto = jsonObject.GetJsonObject("someShto").Deserialize<A>();
             }
 
             public void Write()
@@ -84,7 +85,7 @@ namespace LiteJSON
             Test t1 = new Test();
             t1.b = new[] {"тест", "test2"};
             t1.c = new List<ISomeWhat>();
-            t1.c.Add(new A());
+            t1.c.Add(new A() {s = 0.333f});
             t1.c.Add(new B());
             Console.WriteLine("Converting to json...");
             string text = Json.Serialize(t1);

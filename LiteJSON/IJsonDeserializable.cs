@@ -2,6 +2,6 @@
 {
     public interface IJsonDeserializable
     {
-        JsonObject ToJson();
+        void FromJson(JsonObject jsonObject);
     }
 }
