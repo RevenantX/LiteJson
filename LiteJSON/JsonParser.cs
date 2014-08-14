@@ -114,6 +114,8 @@ namespace LiteJSON
                 {
                     throw new Exception("Unregistered type: " + typeName);
                 }
+
+                EatWhitespace();
             }
             else
             {
