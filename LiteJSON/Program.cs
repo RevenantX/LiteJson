@@ -34,7 +34,7 @@ namespace LiteJSON
 
         class B : ISomeWhat
         {
-            public string z = "sobachka";
+            public string z;
             public A someShto = new A {s = 0.79f};
             public JsonObject ToJson()
             {
@@ -86,7 +86,7 @@ namespace LiteJSON
             t1.b = new[] {"тест", "test2"};
             t1.c = new List<ISomeWhat>();
             t1.c.Add(new A() {s = 0.333f});
-            t1.c.Add(new B());
+            t1.c.Add(new B() {z = "MYTEXT"});
             Console.WriteLine("Converting to json...");
 
             SerializerConfig config = new SerializerConfig();
