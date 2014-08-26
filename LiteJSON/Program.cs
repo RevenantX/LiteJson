@@ -16,7 +16,7 @@ namespace LiteJSON
 
             public JsonObject ToJson()
             {
-                JsonObject obj = new JsonObject("A");
+                JsonObject obj = JsonObject.CreateTyped<A>();
                 obj.Put("s", s);
                 return obj;
             }
@@ -38,7 +38,7 @@ namespace LiteJSON
             public A someShto = new A {s = 0.79f};
             public JsonObject ToJson()
             {
-                JsonObject obj = new JsonObject("B");
+                JsonObject obj = JsonObject.CreateTyped<B>(true);
                 obj.Put("z", z);
                 obj.Put("someShto", someShto);
                 return obj;
@@ -97,8 +97,8 @@ namespace LiteJSON
 
             //TEST2
             TypesInfo ti = new TypesInfo();
-            ti.RegisterType<A>("A");
-            ti.RegisterType<B>("B");
+            ti.RegisterType<A>();
+            ti.RegisterType<B>(true);
 
             Console.WriteLine("Deserializing");
             Test t2 = Json.Deserialize<Test>(text, ti);

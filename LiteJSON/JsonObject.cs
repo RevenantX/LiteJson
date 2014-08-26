@@ -14,10 +14,45 @@ namespace LiteJSON
             _dict = new Dictionary<string, object>();
         }
 
-        public JsonObject(string typeName)
+        public static JsonObject CreateTyped<T>()
         {
-            _dict = new Dictionary<string, object>();
-            _typeName = typeName;
+            JsonObject obj = new JsonObject();
+            obj._typeName = typeof(T).Name;
+            return obj;
+        }
+
+        public static JsonObject CreateTyped<T>(bool fullTypeName)
+        {
+            JsonObject obj = new JsonObject();
+            if(fullTypeName)
+                obj._typeName = typeof(T).FullName;
+            else
+                obj._typeName = typeof(T).Name;
+            return obj;
+        }
+
+        public static JsonObject CreateTyped(Type t)
+        {
+            JsonObject obj = new JsonObject();
+            obj._typeName = t.Name;
+            return obj;
+        }
+
+        public static JsonObject CreateTyped(Type t, bool fullTypeName)
+        {
+            JsonObject obj = new JsonObject();
+            if(fullTypeName)
+                obj._typeName = t.FullName;
+            else
+                obj._typeName = t.Name;
+            return obj;
+        }
+
+        public static JsonObject CreateTyped(string typeName)
+        {
+            JsonObject obj = new JsonObject();
+            obj._typeName = typeName;
+            return obj;
         }
 
         public JsonObject(Type type)
