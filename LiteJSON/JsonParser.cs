@@ -246,7 +246,7 @@ namespace LiteJSON
 
                     s.Append(NextChar());
                     c = PeekChar();
-                    if (c == ':')
+					if (c == ':' || c == ' ')
                     {
                         parsing = false;
                     }

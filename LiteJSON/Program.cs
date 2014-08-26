@@ -102,7 +102,7 @@ namespace LiteJSON
             t2.c[1].Write();
 
             //TEST3
-            string jtext = "{ kalabanga: 5, b: \"Тестовая Строка\", c: \"TestString\" }";
+			string jtext = "{ kalabanga: 5, b  : \"Тестовая Строка\", c: \"TestString\" }";
             JsonObject jo = Json.Deserialize(jtext);
             Console.WriteLine(jo.GetString("b"));
             Console.WriteLine(jo.GetString("c"));
