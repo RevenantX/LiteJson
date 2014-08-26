@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LiteJSON
 {
-    public sealed class JsonParser : IDisposable
+    sealed class JsonDeserializer
     {
         const string WordBreak = "{}[],:\"";
 
@@ -32,41 +32,28 @@ namespace LiteJSON
             NULL,
             WORD
         };
-
-        //private StringReader _json;
+			
         private string _json;
         private int _position;
+		private TypesInfo _typesInfo;
 
-        private Dictionary<string, Type> _types = new Dictionary<string, Type>();
-        public void RegisterType<T>(string name) where T : IJsonDeserializable
+        public JsonDeserializer(TypesInfo typesInfo)
         {
-            _types.Add(name, typeof(T));
-        }
-
-        public T Deserialize<T>(string jsonString) where T : IJsonDeserializable
-        {
-            if (string.IsNullOrEmpty(jsonString))
-            {
-                return default(T);
-            }
-            T result = Activator.CreateInstance<T>();
-            result.FromJson(Parse(jsonString));
-            return result;
+            _typesInfo = typesInfo;
         }
 
         public JsonObject Parse(string jsonString)
         {
+			if (string.IsNullOrEmpty(jsonString))
+			{
+				return null;
+			}
             _json = jsonString;
             _position = 0;
             Token nextToken = NextToken();
             if (nextToken != Token.CURLY_OPEN)
                 throw new Exception("Bad json");
             return ParseObject(false);
-        }
-
-        public void Dispose()
-        {
-            _json = null;
         }
 
         private object ParseValue()
@@ -106,7 +93,7 @@ namespace LiteJSON
             {
                 string typeName = ParseTypeName();
                 Type t;
-                if (!string.IsNullOrEmpty(typeName) && _types.TryGetValue(typeName, out t))
+                    if (!string.IsNullOrEmpty(typeName) && _typesInfo.RegisteredTypes.TryGetValue(typeName, out t))
                 {
                     jsonObject = new JsonObject(t);
                 }

@@ -202,7 +202,7 @@ namespace LiteJSON
 
         public override string ToString()
         {
-            return JsonSerializer.Serialize(this);
+            return JsonSerializer.Serialize(this, new SerializerConfig());
         }
     }
 }

@@ -4,21 +4,25 @@ using System.Text;
 
 namespace LiteJSON
 {
-    public sealed class JsonSerializer
+    sealed class JsonSerializer
     {
         StringBuilder _builder;
+		private SerializerConfig _config;
+		private int _depth;
+		private const int TabSize = 2;
 
-        private JsonSerializer()
+		private JsonSerializer(SerializerConfig config)
         {
-            _builder = new StringBuilder();
+			_builder = new StringBuilder();
+			_config = config;
         }
 
-        public static string Serialize(JsonObject obj)
-        {
-            var instance = new JsonSerializer();
-            instance.SerializeObject(obj);
-            return instance._builder.ToString();
-        }
+        public static string Serialize(JsonObject obj, SerializerConfig config)
+		{
+			var instance = new JsonSerializer(config);
+			instance.SerializeObject(obj);
+			return instance._builder.ToString();
+		}
 
         private void SerializeValue(object value)
         {
@@ -88,28 +92,38 @@ namespace LiteJSON
             }
 
             _builder.Append('{');
-
+			_depth += 1;
+			if (_config.Indent) _builder.Append('\n');
             foreach (string e in obj.Keys)
             {
                 if (!first)
                 {
                     _builder.Append(',');
+                    if (_config.Indent) _builder.Append('\n');
                 }
+                if (_config.Indent) _builder.Append(' ', _depth * TabSize);
+
                 SerializeString(e);
                 _builder.Append(':');
 
                 SerializeValue(obj.Get(e));
 
+
                 first = false;
             }
-
+			_depth -= 1;
+            if (_config.Indent)
+			{
+				_builder.Append('\n');
+				_builder.Append(' ', _depth * TabSize);
+			}
             _builder.Append('}');
         }
 
         private void SerializeArray(JsonArray anArray)
         {
+			_depth += 1;
             _builder.Append('[');
-
             bool first = true;
 
             foreach (object obj in anArray)
@@ -118,12 +132,22 @@ namespace LiteJSON
                 {
                     _builder.Append(',');
                 }
+                if (_config.Indent)
+				{
+					_builder.Append('\n');
+					_builder.Append(' ', _depth * TabSize);
+				}
 
                 SerializeValue(obj);
 
                 first = false;
             }
-
+			_depth -= 1;
+            if (_config.Indent)
+			{
+				_builder.Append('\n');
+				_builder.Append(' ', _depth * TabSize);
+			}
             _builder.Append(']');
         }
 

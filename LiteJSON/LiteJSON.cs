@@ -5,39 +5,52 @@ namespace LiteJSON
 {
     public static class Json
     {
-        /// <summary>
-        /// Parses the string json into a value
-        /// </summary>
-        /// <param name="json">A JSON string.</param>
-        /// <returns>An JsonObject</returns>
-        public static JsonObject Deserialize(string json)
+        public static string Serialize(IJsonSerializable obj)
         {
-            // save the string for debug information
-            if (json == null)
-            {
-                return null;
-            }
-            return new JsonParser().Parse(json);
+            return JsonSerializer.Serialize(obj.ToJson(), new SerializerConfig());
         }
 
-        public static T Deserialize<T>(string json) where T : IJsonDeserializable
+        public static string Serialize(IJsonSerializable obj, SerializerConfig config)
         {
-            return new JsonParser().Deserialize<T>(json);
+            return JsonSerializer.Serialize(obj.ToJson(), config);
         }
 
-        /// <summary>
-        /// Converts a IDictionary / IList object or a simple type (string, int, etc.) into a JSON string
-        /// </summary>
-        /// <param name="obj">A JsonObject</param>
-        /// <returns>A JSON encoded string, or null if object 'json' is not serializable</returns>
         public static string Serialize(JsonObject obj)
         {
-            return JsonSerializer.Serialize(obj);
+            return JsonSerializer.Serialize(obj, new SerializerConfig());
         }
 
-        public static string Serialize(IJsonSerializable jsonSerializable)
+        public static string Serialize(JsonObject obj, SerializerConfig config)
         {
-            return JsonSerializer.Serialize(jsonSerializable.ToJson());
+            return JsonSerializer.Serialize(obj, config);
+        }
+
+        public static T Deserialize<T>(string jsonString, TypesInfo typesInfo) where T : IJsonDeserializable
+        {
+            JsonDeserializer parser = new JsonDeserializer(typesInfo);
+            T result = Activator.CreateInstance<T>();
+            result.FromJson(parser.Parse(jsonString));
+            return result;
+        }
+
+        public static JsonObject Deserialize(string jsonString, TypesInfo typesInfo)
+        {
+            JsonDeserializer parser = new JsonDeserializer(typesInfo);
+            return parser.Parse(jsonString);
+        }
+
+        public static T Deserialize<T>(string jsonString) where T : IJsonDeserializable
+        {
+            JsonDeserializer parser = new JsonDeserializer(new TypesInfo());
+            T result = Activator.CreateInstance<T>();
+            result.FromJson(parser.Parse(jsonString));
+            return result;
+        }
+
+        public static JsonObject Deserialize(string jsonString)
+        {
+            JsonDeserializer parser = new JsonDeserializer(new TypesInfo());
+            return parser.Parse(jsonString);
         }
     }
 }

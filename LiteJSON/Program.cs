@@ -88,22 +88,22 @@ namespace LiteJSON
             t1.c.Add(new A() {s = 0.333f});
             t1.c.Add(new B());
             Console.WriteLine("Converting to json...");
-            string text = Json.Serialize(t1);
+			string text = Json.Serialize(t1);
             Console.WriteLine(text);
 
             //TEST2
-            JsonParser p = new JsonParser();
-            p.RegisterType<A>("A");
-            p.RegisterType<B>("B");
+			TypesInfo ti = new TypesInfo();
+			ti.RegisterType<A>("A");
+			ti.RegisterType<B>("B");
 
             Console.WriteLine("Deserializing");
-            Test t2 = p.Deserialize<Test>(text);
+            Test t2 = Json.Deserialize<Test>(text, ti);
             t2.c[0].Write();
             t2.c[1].Write();
 
             //TEST3
 			string jtext = "{ kalabanga: 5, b  : \"Тестовая Строка\", c: \"TestString\" }";
-            JsonObject jo = Json.Deserialize(jtext);
+			JsonObject jo = Json.Deserialize(jtext);
             Console.WriteLine(jo.GetString("b"));
             Console.WriteLine(jo.GetString("c"));
 
