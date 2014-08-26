@@ -32,10 +32,10 @@ namespace LiteJSON
             NULL,
             WORD
         };
-			
+            
         private string _json;
         private int _position;
-		private TypesInfo _typesInfo;
+        private TypesInfo _typesInfo;
 
         public JsonDeserializer(TypesInfo typesInfo)
         {
@@ -44,10 +44,10 @@ namespace LiteJSON
 
         public JsonObject Parse(string jsonString)
         {
-			if (string.IsNullOrEmpty(jsonString))
-			{
-				return null;
-			}
+            if (string.IsNullOrEmpty(jsonString))
+            {
+                return null;
+            }
             _json = jsonString;
             _position = 0;
             Token nextToken = NextToken();
@@ -233,7 +233,7 @@ namespace LiteJSON
 
                     s.Append(NextChar());
                     c = PeekChar();
-					if (c == ':' || c == ' ')
+                    if (c == ':' || c == ' ')
                     {
                         parsing = false;
                     }
