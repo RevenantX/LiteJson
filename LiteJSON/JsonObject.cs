@@ -55,6 +55,11 @@ namespace LiteJSON
             get { return _typeName; }
         }
 
+        public Type TypeInfo
+        {
+            get { return _type; }
+        }
+
         public void Put<T>(string key, T[] value)
         {
             if (value == null)
@@ -81,30 +86,6 @@ namespace LiteJSON
             _dict.Add(key, value);
         }
 
-        public T Deserialize<T>() where T : IJsonDeserializable
-        {
-            if (_type == null)
-            {
-                throw new Exception("This object does not have type");
-            }
-
-            T jsonSerializable = (T)Activator.CreateInstance(_type);
-            jsonSerializable.FromJson(this);
-            return jsonSerializable;
-        }
-
-        public IJsonDeserializable Deserialize()
-        {
-            if (_type == null)
-            {
-                throw new Exception("This object does not have type");
-            }
-
-            IJsonDeserializable jsonSerializable = (IJsonDeserializable)Activator.CreateInstance(_type);
-            jsonSerializable.FromJson(this);
-            return jsonSerializable;
-        }
-
         public bool Remove(string key)
         {
             return _dict.Remove(key);
@@ -123,6 +104,11 @@ namespace LiteJSON
         public object Get(string key)
         {
             return _dict[key];
+        }
+
+        public T GetDeserializable<T>(string key) where T : IJsonDeserializable
+        {
+            return Json.Deserialize<T>((JsonObject)_dict[key]);
         }
 
         public JsonObject GetJsonObject(string key)

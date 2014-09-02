@@ -47,7 +47,7 @@ namespace LiteJSON
             public void FromJson(JsonObject jsonObject)
             {
                 z = jsonObject.GetString("z");
-                someShto = jsonObject.GetJsonObject("someShto").Deserialize<A>();
+                someShto = jsonObject.GetDeserializable<A>("someShto");
             }
 
             public void Write()

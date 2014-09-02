@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
+using System;
 
 namespace LiteJSON
 {
@@ -234,12 +235,15 @@ namespace LiteJSON
             bool deserialize = typeof(IJsonDeserializable).IsAssignableFrom(typeof(T));
             int count = _list.Count;
             List<T> result = new List<T>(count);
+
             for (int i = 0; i < count; i++)
             {
                 if(deserialize)
                 {
                     JsonObject jsonObject = (JsonObject)_list[i];
-                    result.Add((T)jsonObject.Deserialize());
+                    IJsonDeserializable item = (IJsonDeserializable)Activator.CreateInstance(jsonObject.TypeInfo);
+                    item.FromJson(jsonObject);
+                    result.Add((T)item);
                 }
                 else
                 {
@@ -259,7 +263,9 @@ namespace LiteJSON
                 if(deserialize)
                 {
                     JsonObject jsonObject = (JsonObject)_list[i];
-                    result[i] = (T)jsonObject.Deserialize();
+                    IJsonDeserializable item = (IJsonDeserializable)Activator.CreateInstance(jsonObject.TypeInfo);
+                    item.FromJson(jsonObject);
+                    result[i] = (T)item;
                 }
                 else
                 {
