@@ -50,6 +50,15 @@ namespace LiteJSON
             return result;
         }
 
+        public bool IsNull(int index)
+        {
+            if (index >= 0 && index < _list.Count && _list[index] != null)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public int Count
         {
             get { return _list.Count; }
