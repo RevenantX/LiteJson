@@ -61,6 +61,16 @@ namespace LiteJSON
             _type = type;
         }
 
+        public Dictionary<string, object>.KeyCollection Keys
+        {
+            get { return _dict.Keys; }
+        }
+
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this, new SerializerConfig());
+        }
+
         public string TypeName
         {
             get { return _typeName; }
@@ -121,6 +131,11 @@ namespace LiteJSON
             return jsonSerializable;
         }
 
+        public bool Has(string key)
+        {
+            return _dict.ContainsKey(key);
+        }
+
         public object Get(string key)
         {
             return _dict[key];
@@ -134,6 +149,50 @@ namespace LiteJSON
         public JsonArray GetJsonArray(string key)
         {
             return (JsonArray)_dict[key];
+        }
+
+        public int GetInt(string key)
+        {
+            return (int)_dict[key];
+        }
+
+        public long GetLong(string key)
+        {
+            return (long)_dict[key];
+        }
+
+        public bool GetBool(string key)
+        {
+            return (bool)_dict[key];
+        }
+
+        public string GetString(string key)
+        {
+            return (string)_dict[key];
+        }
+
+        public float GetFloat(string key)
+        {
+            object obj = _dict[key];
+            if (obj is int)
+                return (int)obj;
+            else
+                return (float)obj;
+        }
+
+        public double GetDouble(string key)
+        {
+            return (double)_dict[key];
+        }
+
+        public object Opt(string key)
+        {
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return result;
+            }
+            return null;            
         }
 
         public int OptInt(string key, int defaultValue)
@@ -196,48 +255,84 @@ namespace LiteJSON
             return defaultValue;
         }
 
-        public int GetInt(string key)
+        public JsonObject OptJsonObject(string key)
         {
-            return (int)_dict[key];
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (JsonObject)result;
+            }
+            return null;
         }
 
-        public long GetLong(string key)
+        public JsonArray OptJsonArray(string key)
         {
-            return (long)_dict[key];
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (JsonArray)result;
+            }
+            return null;
         }
 
-        public bool GetBool(string key)
+        public int OptInt(string key)
         {
-            return (bool)_dict[key];
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (int)result;
+            }
+            return 0;
         }
 
-        public string GetString(string key)
+        public long OptLong(string key)
         {
-            return (string)_dict[key];
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (long)result;
+            }
+            return 0;
         }
 
-        public float GetFloat(string key)
+        public bool OptBool(string key)
         {
-            object obj = _dict[key];
-            if (obj is int)
-                return (int)obj;
-            else
-                return (float)obj;
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (bool)result;
+            }
+            return false;
         }
 
-        public double GetDouble(string key)
+        public string OptString(string key)
         {
-            return (double)_dict[key];
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (string)result;
+            }
+            return string.Empty;
         }
 
-        public Dictionary<string, object>.KeyCollection Keys
+        public float OptFloat(string key)
         {
-            get { return _dict.Keys; }
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (float)result;
+            }
+            return float.NaN;
         }
 
-        public override string ToString()
+        public double OptDouble(string key)
         {
-            return JsonSerializer.Serialize(this, new SerializerConfig());
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (double)result;
+            }
+            return double.NaN;
         }
     }
 }

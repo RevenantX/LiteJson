@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
-using System;
 
 namespace LiteJSON
 {
@@ -56,14 +55,169 @@ namespace LiteJSON
             get { return _list.Count; }
         }
 
-        public void Add<T>(T value)
+        public void Add(object value)
         {
             _list.Add(value);
         }
 
-        public T Get<T>(int index)
+        public object Get(int index)
         {
-            return (T)_list[index];
+            return _list[index];
+        }
+
+        public void Remove(int index)
+        {
+            _list.RemoveAt(index);
+        }
+
+        public JsonObject GetJsonObject(int index)
+        {
+            return (JsonObject)_list[index];
+        }
+
+        public JsonArray GetJsonArray(int index)
+        {
+            return (JsonArray)_list[index];
+        }
+
+        public int GetInt(int index)
+        {
+            return (int)_list[index];
+        }
+
+        public long GetLong(int index)
+        {
+            return (long)_list[index];
+        }
+
+        public bool GetBool(int index)
+        {
+            return (bool)_list[index];
+        }
+
+        public string GetString(int index)
+        {
+            return (string)_list[index];
+        }
+
+        public float GetFloat(int index)
+        {
+            object obj = _list[index];
+            if (obj is int)
+                return (int)obj;
+            else
+                return (float)obj;
+        }
+
+        public double GetDouble(int index)
+        {
+            return (double)_list[index];
+        }
+
+        public object Opt(int index)
+        {
+            if (index >= 0 && index < _list.Count)
+                return _list[index];
+            return null;
+        }
+
+        public int OptInt(int index, int defaultValue)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (int)_list[index];
+            return defaultValue;
+        }
+
+        public long OptLong(int index, long defaultValue)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (long)_list[index];
+            return defaultValue;
+        }
+
+        public bool OptBool(int index, bool defaultValue)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (bool)_list[index];
+            return defaultValue;
+        }
+
+        public string OptString(int index, string defaultValue)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (string)_list[index];
+            return defaultValue;
+        }
+
+        public float OptFloat(int index, float defaultValue)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (float)_list[index];
+            return defaultValue;
+        }
+
+        public double OptDouble(int index, double defaultValue)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (double)_list[index];
+            return defaultValue;
+        }
+
+        public JsonObject OptJsonObject(int index)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (JsonObject)_list[index];
+            return null;
+        }
+
+        public JsonArray OptJsonArray(int index)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (JsonArray)_list[index];
+            return null;
+        }
+
+        public int OptInt(int index)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (int)_list[index];
+            return 0;
+        }
+
+        public long OptLong(int index)
+        {
+            object result;
+            if (index >= 0 && index < _list.Count)
+                return (long)_list[index];
+            return 0;
+        }
+
+        public bool OptBool(int index)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (bool)_list[index];
+            return false;
+        }
+
+        public string OptString(int index)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (string)_list[index];
+            return string.Empty;
+        }
+
+        public float OptFloat(int index)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (float)_list[index];
+            return float.NaN;
+        }
+
+        public double OptDouble(int index)
+        {
+            if (index >= 0 && index < _list.Count)
+                return (double)_list[index];
+            return double.NaN;
         }
 
         public List<T> ToList<T>()
