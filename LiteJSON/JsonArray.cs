@@ -230,52 +230,121 @@ namespace LiteJSON
             return double.NaN;
         }
 
-        public T GetDeserializable<T>(int index) where T : IJsonDeserializable
+        public T Deserialize<T>(int index) where T : IJsonDeserializable
         {
             return Json.Deserialize<T>((JsonObject) _list[index]);
         }
 
-        public List<T> ToList<T>()
+        private List<T> ToListGeneric<T>()
         {
-            bool deserialize = typeof(IJsonDeserializable).IsAssignableFrom(typeof(T));
             int count = _list.Count;
             List<T> result = new List<T>(count);
-
             for (int i = 0; i < count; i++)
             {
-                if(deserialize)
-                {
-                    JsonObject jsonObject = (JsonObject)_list[i];
-                    IJsonDeserializable item = (IJsonDeserializable)Activator.CreateInstance(jsonObject.TypeInfo);
-                    item.FromJson(jsonObject);
-                    result.Add((T)item);
-                }
-                else
-                {
-                    result.Add((T)_list[i]);
-                }
+                result.Add((T)_list[i]);
             }
             return result;
         }
 
-        public T[] ToArray<T>()
+        public List<object> ToList()
         {
-            bool deserialize = typeof(IJsonDeserializable).IsAssignableFrom(typeof(T));
+            return new List<object>(_list);
+        }
+
+        public List<int> ToListInt()
+        {
+            return ToListGeneric<int>();
+        }
+
+        public List<long> ToListLong()
+        {
+            return ToListGeneric<long>();
+        }
+
+        public List<string> ToListString()
+        {
+            return ToListGeneric<string>();
+        }
+
+        public List<bool> ToListBool()
+        {
+            return ToListGeneric<bool>();
+        }
+
+        public List<float> ToListFloat()
+        {
+            return ToListGeneric<float>();
+        }
+
+        public List<double> ToListDouble()
+        {
+            return ToListGeneric<double>();
+        }
+
+        public List<T> DeserializeToList<T>() where T : IJsonDeserializable
+        {
+            int count = _list.Count;
+            List<T> result = new List<T>(count);
+            for (int i = 0; i < count; i++)
+            {
+                result.Add(Json.Deserialize<T>((JsonObject)_list[i]));
+            }
+            return result;
+        }
+
+        private T[] ToArrayGeneric<T>()
+        {
             int count = _list.Count;
             T[] result = new T[count];
             for (int i = 0; i < count; i++)
             {
-                if(deserialize)
-                {
-                    JsonObject jsonObject = (JsonObject)_list[i];
-                    IJsonDeserializable item = (IJsonDeserializable)Activator.CreateInstance(jsonObject.TypeInfo);
-                    item.FromJson(jsonObject);
-                    result[i] = (T)item;
-                }
-                else
-                {
-                    result[i] = (T)_list[i];
-                }
+                result[i] = (T) _list[i];
+            }
+            return result;
+        }
+
+        public object[] ToArray()
+        {
+            return _list.ToArray();
+        }
+
+        public int[] ToArrayInt()
+        {
+            return ToArrayGeneric<int>();
+        }
+
+        public long[] ToArrayLong()
+        {
+            return ToArrayGeneric<long>();
+        }
+
+        public string[] ToArrayString()
+        {
+            return ToArrayGeneric<string>();
+        }
+
+        public bool[] ToArrayBool()
+        {
+            return ToArrayGeneric<bool>();
+        }
+
+        public float[] ToArrayFloat()
+        {
+            return ToArrayGeneric<float>();
+        }
+
+        public double[] ToArrayDouble()
+        {
+            return ToArrayGeneric<double>();
+        }
+
+        public T[] DeserializeToArray<T>() where T : IJsonDeserializable
+        {
+            int count = _list.Count;
+            T[] result = new T[count];
+            for (int i = 0; i < count; i++)
+            {
+                result[i] = Json.Deserialize<T>((JsonObject)_list[i]);
             }
             return result; 
         }

@@ -327,7 +327,7 @@ namespace LiteJSON
             {
                 long parsedInt;
                 Int64.TryParse(number, out parsedInt);
-                if (parsedInt <= int.MaxValue || parsedInt >= int.MinValue)
+                if (parsedInt <= int.MaxValue && parsedInt >= int.MinValue)
                     return (int)parsedInt;
                 else
                     return parsedInt;
@@ -335,7 +335,7 @@ namespace LiteJSON
 
             double parsedDouble;
             Double.TryParse(number, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US").NumberFormat, out parsedDouble);
-            if (parsedDouble <= float.MaxValue || parsedDouble >= float.MinValue)
+            if (parsedDouble <= float.MaxValue && parsedDouble >= float.MinValue)
                 return (float)parsedDouble;
             else
                 return parsedDouble;

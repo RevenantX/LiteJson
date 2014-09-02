@@ -118,7 +118,7 @@ namespace LiteJSON
             return _dict[key];
         }
 
-        public T GetDeserializable<T>(string key) where T : IJsonDeserializable
+        public T Deserialize<T>(string key) where T : IJsonDeserializable
         {
             return Json.Deserialize<T>((JsonObject) _dict[key]);
         }
@@ -140,7 +140,11 @@ namespace LiteJSON
 
         public long GetLong(string key)
         {
-            return (long)_dict[key];
+            object obj = _dict[key];
+            if (obj is int)
+                return (int)obj;
+            else
+                return (long)obj;
         }
 
         public bool GetBool(string key)
@@ -164,7 +168,11 @@ namespace LiteJSON
 
         public double GetDouble(string key)
         {
-            return (double)_dict[key];
+            object obj = _dict[key];
+            if (obj is int)
+                return (int)obj;
+            else
+                return (double)obj;
         }
 
         public object Opt(string key)
