@@ -16,7 +16,7 @@ namespace LiteJSON
 
             public JsonObject ToJson()
             {
-                JsonObject obj = JsonObject.CreateTyped<A>();
+                JsonObject obj = new JsonObject(typeof(A));
                 obj.Put("s", s);
                 return obj;
             }
@@ -38,7 +38,7 @@ namespace LiteJSON
             public A someShto = new A {s = 0.79f};
             public JsonObject ToJson()
             {
-                JsonObject obj = JsonObject.CreateTyped<B>(true);
+                JsonObject obj = new JsonObject(typeof(B), true);
                 obj.Put("z", z);
                 obj.Put("someShto", someShto);
                 return obj;

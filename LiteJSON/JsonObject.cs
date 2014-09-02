@@ -14,51 +14,23 @@ namespace LiteJSON
             _dict = new Dictionary<string, object>();
         }
 
-        public static JsonObject CreateTyped<T>()
-        {
-            JsonObject obj = new JsonObject();
-            obj._typeName = typeof(T).Name;
-            return obj;
-        }
-
-        public static JsonObject CreateTyped<T>(bool fullTypeName)
-        {
-            JsonObject obj = new JsonObject();
-            if(fullTypeName)
-                obj._typeName = typeof(T).FullName;
-            else
-                obj._typeName = typeof(T).Name;
-            return obj;
-        }
-
-        public static JsonObject CreateTyped(Type t)
-        {
-            JsonObject obj = new JsonObject();
-            obj._typeName = t.Name;
-            return obj;
-        }
-
-        public static JsonObject CreateTyped(Type t, bool fullTypeName)
-        {
-            JsonObject obj = new JsonObject();
-            if(fullTypeName)
-                obj._typeName = t.FullName;
-            else
-                obj._typeName = t.Name;
-            return obj;
-        }
-
-        public static JsonObject CreateTyped(string typeName)
-        {
-            JsonObject obj = new JsonObject();
-            obj._typeName = typeName;
-            return obj;
-        }
-
         public JsonObject(Type type)
         {
             _dict = new Dictionary<string, object>();
             _type = type;
+            _typeName = type.Name;
+        }
+
+        public JsonObject(Type type, bool fullTypeName)
+        {
+            _dict = new Dictionary<string, object>();
+            _type = type;
+            _typeName = fullTypeName ? type.FullName : type.Name;
+        }
+
+        public JsonObject(string source)
+        {
+            _dict = Json.Deserialize(source)._dict;
         }
 
         public Dictionary<string, object>.KeyCollection Keys
@@ -71,14 +43,16 @@ namespace LiteJSON
             return JsonSerializer.Serialize(this, new SerializerConfig());
         }
 
+        public string ToString(bool indent)
+        {
+            SerializerConfig config = new SerializerConfig();
+            config.Indent = indent;
+            return JsonSerializer.Serialize(this, config);
+        }
+
         public string TypeName
         {
             get { return _typeName; }
-        }
-
-        public Type Type
-        {
-            get { return _type; }
         }
 
         public void Put<T>(string key, T[] value)
@@ -119,7 +93,7 @@ namespace LiteJSON
             return jsonSerializable;
         }
 
-        public object Deserialize()
+        public IJsonDeserializable Deserialize()
         {
             if (_type == null)
             {
@@ -131,9 +105,19 @@ namespace LiteJSON
             return jsonSerializable;
         }
 
+        public bool Remove(string key)
+        {
+            return _dict.Remove(key);
+        }
+
         public bool Has(string key)
         {
             return _dict.ContainsKey(key);
+        }
+
+        public bool IsNull(string key)
+        {
+            return !_dict.ContainsKey(key) || _dict[key] == null;
         }
 
         public object Get(string key)

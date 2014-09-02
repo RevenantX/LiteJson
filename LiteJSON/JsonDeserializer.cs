@@ -88,12 +88,12 @@ namespace LiteJSON
 
         private JsonObject ParseObject(bool withType)
         {
-            JsonObject jsonObject = null;
+            JsonObject jsonObject;
             if (withType)
             {
                 string typeName = ParseTypeName();
                 Type t;
-                    if (!string.IsNullOrEmpty(typeName) && _typesInfo.RegisteredTypes.TryGetValue(typeName, out t))
+                if (!string.IsNullOrEmpty(typeName) && _typesInfo.RegisteredTypes.TryGetValue(typeName, out t))
                 {
                     jsonObject = new JsonObject(t);
                 }
