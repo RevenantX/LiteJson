@@ -235,17 +235,6 @@ namespace LiteJSON
             return Json.Deserialize<T>((JsonObject) _list[index]);
         }
 
-        private List<T> ToListGeneric<T>()
-        {
-            int count = _list.Count;
-            List<T> result = new List<T>(count);
-            for (int i = 0; i < count; i++)
-            {
-                result.Add((T)_list[i]);
-            }
-            return result;
-        }
-
         public List<object> ToList()
         {
             return new List<object>(_list);
@@ -253,32 +242,94 @@ namespace LiteJSON
 
         public List<int> ToListInt()
         {
-            return ToListGeneric<int>();
+            int count = _list.Count;
+            List<int> result = new List<int>(count);
+            for (int i = 0; i < count; i++)
+            {
+                result.Add((int)_list[i]);
+            }
+            return result;
         }
 
         public List<long> ToListLong()
         {
-            return ToListGeneric<long>();
+            int count = _list.Count;
+            List<long> result = new List<long>(count);
+            for (int i = 0; i < count; i++)
+            {
+                object current = _list[i];
+                long value;
+
+                if (current is int)
+                    value = (int) current;
+                else
+                    value = (long) current;
+                
+                result.Add(value);
+            }
+            return result;
         }
 
         public List<string> ToListString()
         {
-            return ToListGeneric<string>();
+            int count = _list.Count;
+            List<string> result = new List<string>(count);
+            for (int i = 0; i < count; i++)
+            {
+                result.Add((string)_list[i]);
+            }
+            return result;
         }
 
         public List<bool> ToListBool()
         {
-            return ToListGeneric<bool>();
+            int count = _list.Count;
+            List<bool> result = new List<bool>(count);
+            for (int i = 0; i < count; i++)
+            {
+                result.Add((bool)_list[i]);
+            }
+            return result;
         }
 
         public List<float> ToListFloat()
         {
-            return ToListGeneric<float>();
+            int count = _list.Count;
+            List<float> result = new List<float>(count);
+            for (int i = 0; i < count; i++)
+            {
+                object current = _list[i];
+                float value;
+
+                if (current is int)
+                    value = (int)current;
+                else
+                    value = (float)current;
+
+                result.Add(value);
+            }
+            return result;
         }
 
         public List<double> ToListDouble()
         {
-            return ToListGeneric<double>();
+            int count = _list.Count;
+            List<double> result = new List<double>(count);
+            for (int i = 0; i < count; i++)
+            {
+                object current = _list[i];
+                double value;
+
+                if (current is int)
+                    value = (int)current;
+                else if (current is float)
+                    value = (float) current;
+                else
+                    value = (double)current;
+
+                result.Add(value);
+            }
+            return result;
         }
 
         public List<T> DeserializeToList<T>() where T : IJsonDeserializable
@@ -292,17 +343,6 @@ namespace LiteJSON
             return result;
         }
 
-        private T[] ToArrayGeneric<T>()
-        {
-            int count = _list.Count;
-            T[] result = new T[count];
-            for (int i = 0; i < count; i++)
-            {
-                result[i] = (T) _list[i];
-            }
-            return result;
-        }
-
         public object[] ToArray()
         {
             return _list.ToArray();
@@ -310,32 +350,94 @@ namespace LiteJSON
 
         public int[] ToArrayInt()
         {
-            return ToArrayGeneric<int>();
+            int count = _list.Count;
+            int[] result = new int[count];
+            for (int i = 0; i < count; i++)
+            {
+                result[i] = (int)_list[i];
+            }
+            return result;
         }
 
         public long[] ToArrayLong()
         {
-            return ToArrayGeneric<long>();
+            int count = _list.Count;
+            long[] result = new long[count];
+            for (int i = 0; i < count; i++)
+            {
+                object current = _list[i];
+                long value;
+
+                if (current is int)
+                    value = (int)current;
+                else
+                    value = (long)current;
+
+                result[i] = value;
+            }
+            return result;
         }
 
         public string[] ToArrayString()
         {
-            return ToArrayGeneric<string>();
+            int count = _list.Count;
+            string[] result = new string[count];
+            for (int i = 0; i < count; i++)
+            {
+                result[i] = (string)_list[i];
+            }
+            return result;
         }
 
         public bool[] ToArrayBool()
         {
-            return ToArrayGeneric<bool>();
+            int count = _list.Count;
+            bool[] result = new bool[count];
+            for (int i = 0; i < count; i++)
+            {
+                result[i] = (bool)_list[i];
+            }
+            return result;
         }
 
         public float[] ToArrayFloat()
         {
-            return ToArrayGeneric<float>();
+            int count = _list.Count;
+            float[] result = new float[count];
+            for (int i = 0; i < count; i++)
+            {
+                object current = _list[i];
+                float value;
+
+                if (current is int)
+                    value = (int)current;
+                else
+                    value = (float)current;
+
+                result[i] = value;
+            }
+            return result;
         }
 
         public double[] ToArrayDouble()
         {
-            return ToArrayGeneric<double>();
+            int count = _list.Count;
+            double[] result = new double[count];
+            for (int i = 0; i < count; i++)
+            {
+                object current = _list[i];
+                double value;
+
+                if (current is int)
+                    value = (int)current;
+                else if (current is float)
+                    value = (float) current;
+                else
+                    value = (double)current;
+
+                result[i] = value;
+            }
+            return result;
         }
 
         public T[] DeserializeToArray<T>() where T : IJsonDeserializable

@@ -59,7 +59,7 @@ namespace LiteJSON
 
         class Test : IJsonSerializable, IJsonDeserializable
         {
-            public float a;
+            public double a;
             public string[] b;
             public List<ISomeWhat> c;
             public long d;
@@ -76,7 +76,7 @@ namespace LiteJSON
 
             public void FromJson(JsonObject jsonObject)
             {
-                a = (float)jsonObject.GetDouble("a");
+                a = jsonObject.GetDouble("a");
                 b = jsonObject.GetJsonArray("b").ToArrayString();
                 c = jsonObject.GetJsonArray("c").DeserializeToList<ISomeWhat>();
                 d = jsonObject.GetLong("d");
@@ -87,6 +87,7 @@ namespace LiteJSON
         {
             //TEST1
             Test t1 = new Test();
+            t1.a = 0.7f;
             t1.b = new[] {"тест", "test2"};
             t1.c = new List<ISomeWhat>();
             t1.c.Add(new A{s = 0.333f});

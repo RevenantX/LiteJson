@@ -143,8 +143,7 @@ namespace LiteJSON
             object obj = _dict[key];
             if (obj is int)
                 return (int)obj;
-            else
-                return (long)obj;
+            return (long)obj;
         }
 
         public bool GetBool(string key)
@@ -162,8 +161,7 @@ namespace LiteJSON
             object obj = _dict[key];
             if (obj is int)
                 return (int)obj;
-            else
-                return (float)obj;
+            return (float)obj;
         }
 
         public double GetDouble(string key)
@@ -171,8 +169,9 @@ namespace LiteJSON
             object obj = _dict[key];
             if (obj is int)
                 return (int)obj;
-            else
-                return (double)obj;
+            if (obj is float)
+                return (float) obj;
+            return (double)obj;
         }
 
         public object Opt(string key)
