@@ -35,7 +35,7 @@ namespace LiteJSON
         class B : ISomeWhat
         {
             public string z;
-            public A someShto = new A {s = 0.79f};
+            public ISomeWhat someShto = new A { s = 0.79f };
             public JsonObject ToJson()
             {
                 JsonObject obj = new JsonObject(typeof(B), true);
@@ -47,12 +47,13 @@ namespace LiteJSON
             public void FromJson(JsonObject jsonObject)
             {
                 z = jsonObject.GetString("z");
-                someShto = jsonObject.GetDeserializable<A>("someShto");
+                someShto = jsonObject.GetDeserializable<ISomeWhat>("someShto");
             }
 
             public void Write()
             {
                 Console.WriteLine("I am B: " + z);
+                someShto.Write();
             }
         }
 
@@ -85,8 +86,8 @@ namespace LiteJSON
             Test t1 = new Test();
             t1.b = new[] {"тест", "test2"};
             t1.c = new List<ISomeWhat>();
-            t1.c.Add(new A() {s = 0.333f});
-            t1.c.Add(new B() {z = "MYTEXT"});
+            t1.c.Add(new A{s = 0.333f});
+            t1.c.Add(new B{z = "MYTEXT"});
             Console.WriteLine("Converting to json...");
 
             SerializerConfig config = new SerializerConfig();
@@ -107,7 +108,7 @@ namespace LiteJSON
 
             //TEST3
             string jtext = "{ kalabanga: 5, b  : \"Тестовая Строка\", c: \"TestString\" }";
-            JsonObject jo = Json.Deserialize(jtext);
+            JsonObject jo = new JsonObject(jtext);
             Console.WriteLine(jo.GetString("b"));
             Console.WriteLine(jo.GetString("c"));
 

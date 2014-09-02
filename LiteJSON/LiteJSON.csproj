@@ -41,7 +41,7 @@
     <Compile Include="JsonObject.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="SerializerConfig.cs" />
-    <Compile Include="JsonDeserializer.cs" />
+    <Compile Include="JsonParser.cs" />
     <Compile Include="TypesInfo.cs" />
     <Compile Include="LiteJSON.cs" />
   </ItemGroup>

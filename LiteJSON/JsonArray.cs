@@ -230,6 +230,11 @@ namespace LiteJSON
             return double.NaN;
         }
 
+        public T GetDeserializable<T>(int index) where T : IJsonDeserializable
+        {
+            return Json.Deserialize<T>((JsonObject) _list[index]);
+        }
+
         public List<T> ToList<T>()
         {
             bool deserialize = typeof(IJsonDeserializable).IsAssignableFrom(typeof(T));

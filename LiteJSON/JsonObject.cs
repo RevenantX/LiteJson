@@ -30,7 +30,14 @@ namespace LiteJSON
 
         public JsonObject(string source)
         {
-            _dict = Json.Deserialize(source)._dict;
+            JsonParser parser = new JsonParser(new TypesInfo());
+            _dict = parser.Parse(source)._dict;
+        }
+
+        public JsonObject(string source, TypesInfo typesInfo)
+        {
+            JsonParser parser = new JsonParser(typesInfo);
+            _dict = parser.Parse(source)._dict;
         }
 
         public Dictionary<string, object>.KeyCollection Keys
@@ -47,6 +54,11 @@ namespace LiteJSON
         {
             SerializerConfig config = new SerializerConfig();
             config.Indent = indent;
+            return JsonSerializer.Serialize(this, config);
+        }
+
+        public string ToString(SerializerConfig config)
+        {
             return JsonSerializer.Serialize(this, config);
         }
 
@@ -108,7 +120,7 @@ namespace LiteJSON
 
         public T GetDeserializable<T>(string key) where T : IJsonDeserializable
         {
-            return Json.Deserialize<T>((JsonObject)_dict[key]);
+            return Json.Deserialize<T>((JsonObject) _dict[key]);
         }
 
         public JsonObject GetJsonObject(string key)

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LiteJSON
 {
-    sealed class JsonDeserializer
+    sealed class JsonParser
     {
         const string WordBreak = "{}[],:\"";
 
@@ -37,7 +37,7 @@ namespace LiteJSON
         private int _position;
         private TypesInfo _typesInfo;
 
-        public JsonDeserializer(TypesInfo typesInfo)
+        public JsonParser(TypesInfo typesInfo)
         {
             _typesInfo = typesInfo;
         }

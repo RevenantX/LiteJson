@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System;
+﻿using System;
 
 namespace LiteJSON
 {
@@ -15,19 +14,9 @@ namespace LiteJSON
             return JsonSerializer.Serialize(obj.ToJson(), config);
         }
 
-        public static string Serialize(JsonObject obj)
-        {
-            return JsonSerializer.Serialize(obj, new SerializerConfig());
-        }
-
-        public static string Serialize(JsonObject obj, SerializerConfig config)
-        {
-            return JsonSerializer.Serialize(obj, config);
-        }
-
         public static T Deserialize<T>(string jsonString, TypesInfo typesInfo) where T : IJsonDeserializable
         {
-            JsonDeserializer parser = new JsonDeserializer(typesInfo);
+            JsonParser parser = new JsonParser(typesInfo);
             T result = Activator.CreateInstance<T>();
             result.FromJson(parser.Parse(jsonString));
             return result;
@@ -35,7 +24,7 @@ namespace LiteJSON
 
         public static T Deserialize<T>(string jsonString) where T : IJsonDeserializable
         {
-            JsonDeserializer parser = new JsonDeserializer(new TypesInfo());
+            JsonParser parser = new JsonParser(new TypesInfo());
             T result = Activator.CreateInstance<T>();
             result.FromJson(parser.Parse(jsonString));
             return result;
@@ -43,21 +32,18 @@ namespace LiteJSON
 
         public static T Deserialize<T>(JsonObject jsonObject) where T : IJsonDeserializable
         {
-            T jsonSerializable = Activator.CreateInstance<T>();
-            jsonSerializable.FromJson(jsonObject);
-            return jsonSerializable;
-        }
-
-        public static JsonObject Deserialize(string jsonString, TypesInfo typesInfo)
-        {
-            JsonDeserializer parser = new JsonDeserializer(typesInfo);
-            return parser.Parse(jsonString);
-        }
-
-        public static JsonObject Deserialize(string jsonString)
-        {
-            JsonDeserializer parser = new JsonDeserializer(new TypesInfo());
-            return parser.Parse(jsonString);
+            if (jsonObject.TypeInfo != null)
+            {
+                T item = (T)Activator.CreateInstance(jsonObject.TypeInfo);
+                item.FromJson(jsonObject);
+                return item;
+            }
+            else
+            {
+                T item = Activator.CreateInstance<T>();
+                item.FromJson(jsonObject);
+                return item;
+            }
         }
     }
 }
