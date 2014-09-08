@@ -326,19 +326,26 @@ namespace LiteJSON
             if (number.IndexOf('.') == -1)
             {
                 long parsedInt;
-                Int64.TryParse(number, out parsedInt);
-                if (parsedInt <= int.MaxValue && parsedInt >= int.MinValue)
-                    return (int)parsedInt;
-                else
+                if (Int64.TryParse(number, out parsedInt))
+                {
                     return parsedInt;
+                }
+                else
+                {
+                    throw new Exception("Incorrect number");
+                }
             }
 
             double parsedDouble;
-            Double.TryParse(number, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US").NumberFormat, out parsedDouble);
-            if (parsedDouble <= float.MaxValue && parsedDouble >= float.MinValue)
-                return (float)parsedDouble;
-            else
+            if (Double.TryParse(number, NumberStyles.AllowDecimalPoint,
+                CultureInfo.CreateSpecificCulture("en-US").NumberFormat, out parsedDouble))
+            {
                 return parsedDouble;
+            }
+            else
+            {
+                throw new Exception("Incorrect number");
+            }
         }
 
         private void EatWhitespace()

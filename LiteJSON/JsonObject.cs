@@ -135,14 +135,17 @@ namespace LiteJSON
 
         public int GetInt(string key)
         {
-            return (int)_dict[key];
+            object obj = _dict[key];
+            if (obj is double)
+                return (int)(double)obj;
+            return (int)(long)obj;
         }
 
         public long GetLong(string key)
         {
             object obj = _dict[key];
-            if (obj is int)
-                return (int)obj;
+            if (obj is double)
+                return (long)(double)obj;
             return (long)obj;
         }
 
@@ -159,18 +162,16 @@ namespace LiteJSON
         public float GetFloat(string key)
         {
             object obj = _dict[key];
-            if (obj is int)
-                return (int)obj;
-            return (float)obj;
+            if (obj is long)
+                return (long)obj;
+            return (float)(double)obj;
         }
 
         public double GetDouble(string key)
         {
             object obj = _dict[key];
-            if (obj is int)
-                return (int)obj;
-            if (obj is float)
-                return (float) obj;
+            if (obj is long)
+                return (long)obj;
             return (double)obj;
         }
 

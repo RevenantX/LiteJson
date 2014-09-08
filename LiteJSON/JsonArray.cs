@@ -90,16 +90,6 @@ namespace LiteJSON
             return (JsonArray)_list[index];
         }
 
-        public int GetInt(int index)
-        {
-            return (int)_list[index];
-        }
-
-        public long GetLong(int index)
-        {
-            return (long)_list[index];
-        }
-
         public bool GetBool(int index)
         {
             return (bool)_list[index];
@@ -110,18 +100,36 @@ namespace LiteJSON
             return (string)_list[index];
         }
 
+        public int GetInt(int index)
+        {
+            object obj = _list[index];
+            if (obj is double)
+                return (int)(double)obj;
+            return (int)(long)obj;
+        }
+
+        public long GetLong(int index)
+        {
+            object obj = _list[index];
+            if (obj is double)
+                return (long)(double)obj;
+            return (long)obj;
+        }
+
         public float GetFloat(int index)
         {
             object obj = _list[index];
-            if (obj is int)
-                return (int)obj;
-            else
-                return (float)obj;
+            if (obj is long)
+                return (long)obj;
+            return (float)(double)obj;
         }
 
         public double GetDouble(int index)
         {
-            return (double)_list[index];
+            object obj = _list[index];
+            if (obj is long)
+                return (long)obj;
+            return (double)obj;
         }
 
         public object Opt(int index)
