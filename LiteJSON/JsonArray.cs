@@ -362,7 +362,7 @@ namespace LiteJSON
             int[] result = new int[count];
             for (int i = 0; i < count; i++)
             {
-                result[i] = (int)_list[i];
+                result[i] = (int)(long)_list[i];
             }
             return result;
         }
@@ -373,15 +373,7 @@ namespace LiteJSON
             long[] result = new long[count];
             for (int i = 0; i < count; i++)
             {
-                object current = _list[i];
-                long value;
-
-                if (current is int)
-                    value = (int)current;
-                else
-                    value = (long)current;
-
-                result[i] = value;
+                result[i] = (long)_list[i];
             }
             return result;
         }
@@ -414,15 +406,7 @@ namespace LiteJSON
             float[] result = new float[count];
             for (int i = 0; i < count; i++)
             {
-                object current = _list[i];
-                float value;
-
-                if (current is int)
-                    value = (int)current;
-                else
-                    value = (float)current;
-
-                result[i] = value;
+                result[i] = (float)(double)_list[i];
             }
             return result;
         }
@@ -433,17 +417,7 @@ namespace LiteJSON
             double[] result = new double[count];
             for (int i = 0; i < count; i++)
             {
-                object current = _list[i];
-                double value;
-
-                if (current is int)
-                    value = (int)current;
-                else if (current is float)
-                    value = (float) current;
-                else
-                    value = (double)current;
-
-                result[i] = value;
+                result[i] = (double)_list[i];
             }
             return result;
         }
