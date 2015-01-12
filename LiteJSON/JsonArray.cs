@@ -204,7 +204,6 @@ namespace LiteJSON
 
         public long OptLong(int index)
         {
-            object result;
             if (index >= 0 && index < _list.Count)
                 return (long)_list[index];
             return 0;
