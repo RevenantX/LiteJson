@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace LiteJSON
@@ -175,6 +175,17 @@ namespace LiteJSON
             return (double)obj;
         }
 
+
+        public T GetEnum<T>(string key) where T : struct, IConvertible
+        {
+            return (T)Enum.Parse(typeof(T), (string) _dict[key]);
+        }
+
+        public object GetEnum(string key, Type enumType)
+        {
+            return Enum.Parse(enumType, (string)_dict[key]);
+        }
+
         public object Opt(string key)
         {
             object result;
@@ -190,7 +201,9 @@ namespace LiteJSON
             object result;
             if (_dict.TryGetValue(key, out result))
             {
-                return (int)result;
+                if (result is double)
+                    return (int)(double)result;
+                return (int)(long)result;
             }
             return defaultValue;
         }
@@ -200,6 +213,8 @@ namespace LiteJSON
             object result;
             if (_dict.TryGetValue(key, out result))
             {
+                if (result is double)
+                    return (long)(double)result;
                 return (long)result;
             }
             return defaultValue;
@@ -230,7 +245,9 @@ namespace LiteJSON
             object result;
             if (_dict.TryGetValue(key, out result))
             {
-                return (float)result;
+                if (result is long)
+                    return (long)result;
+                return (float)(double)result;
             }
             return defaultValue;
         }
@@ -240,6 +257,8 @@ namespace LiteJSON
             object result;
             if (_dict.TryGetValue(key, out result))
             {
+                if (result is long)
+                    return (long)result;
                 return (double)result;
             }
             return defaultValue;
@@ -267,62 +286,32 @@ namespace LiteJSON
 
         public int OptInt(string key)
         {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                return (int)result;
-            }
-            return 0;
+            return OptInt(key, 0);
         }
 
         public long OptLong(string key)
         {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                return (long)result;
-            }
-            return 0;
+            return OptLong(key, 0L);
         }
 
         public bool OptBool(string key)
         {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                return (bool)result;
-            }
-            return false;
+            return OptBool(key, false);
         }
 
         public string OptString(string key)
         {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                return (string)result;
-            }
-            return string.Empty;
+            return OptString(key, String.Empty);
         }
 
         public float OptFloat(string key)
         {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                return (float)result;
-            }
-            return float.NaN;
+            return OptFloat(key, 0f);
         }
 
         public double OptDouble(string key)
         {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                return (double)result;
-            }
-            return double.NaN;
+            return OptDouble(key, 0d);
         }
     }
 }

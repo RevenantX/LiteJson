@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections;
-using System;
 
 namespace LiteJSON
 {
@@ -53,11 +52,7 @@ namespace LiteJSON
 
         public bool IsNull(int index)
         {
-            if (index >= 0 && index < _list.Count && _list[index] != null)
-            {
-                return false;
-            }
-            return true;
+            return index < 0 || index >= _list.Count || _list[index] == null;
         }
 
         public int Count
@@ -130,111 +125,6 @@ namespace LiteJSON
             if (obj is long)
                 return (long)obj;
             return (double)obj;
-        }
-
-        public object Opt(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return _list[index];
-            return null;
-        }
-
-        public int OptInt(int index, int defaultValue)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (int)_list[index];
-            return defaultValue;
-        }
-
-        public long OptLong(int index, long defaultValue)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (long)_list[index];
-            return defaultValue;
-        }
-
-        public bool OptBool(int index, bool defaultValue)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (bool)_list[index];
-            return defaultValue;
-        }
-
-        public string OptString(int index, string defaultValue)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (string)_list[index];
-            return defaultValue;
-        }
-
-        public float OptFloat(int index, float defaultValue)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (float)_list[index];
-            return defaultValue;
-        }
-
-        public double OptDouble(int index, double defaultValue)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (double)_list[index];
-            return defaultValue;
-        }
-
-        public JsonObject OptJsonObject(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (JsonObject)_list[index];
-            return null;
-        }
-
-        public JsonArray OptJsonArray(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (JsonArray)_list[index];
-            return null;
-        }
-
-        public int OptInt(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (int)_list[index];
-            return 0;
-        }
-
-        public long OptLong(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (long)_list[index];
-            return 0;
-        }
-
-        public bool OptBool(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (bool)_list[index];
-            return false;
-        }
-
-        public string OptString(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (string)_list[index];
-            return string.Empty;
-        }
-
-        public float OptFloat(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (float)_list[index];
-            return float.NaN;
-        }
-
-        public double OptDouble(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (double)_list[index];
-            return double.NaN;
         }
 
         public T Deserialize<T>(int index) where T : IJsonDeserializable

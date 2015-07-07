@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace LiteJSON
@@ -116,8 +116,6 @@ namespace LiteJSON
             JsonObject jo = new JsonObject(jtext);
             Console.WriteLine(jo.GetString("b"));
             Console.WriteLine(jo.GetString("c"));
-
-            Console.WriteLine("Must be: Тестовая строка");
 
             Console.ReadKey();
         }
