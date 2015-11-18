@@ -196,31 +196,27 @@ namespace LiteJSON
             return null;            
         }
 
-        public int OptInt(string key, int defaultValue)
+        public int OptInt(string key, int defaultValue = 0)
         {
             object result;
             if (_dict.TryGetValue(key, out result))
             {
-                if (result is double)
-                    return (int)(double)result;
                 return (int)(long)result;
             }
             return defaultValue;
         }
 
-        public long OptLong(string key, long defaultValue)
+        public long OptLong(string key, long defaultValue = 0)
         {
             object result;
             if (_dict.TryGetValue(key, out result))
             {
-                if (result is double)
-                    return (long)(double)result;
                 return (long)result;
             }
             return defaultValue;
         }
 
-        public bool OptBool(string key, bool defaultValue)
+        public bool OptBool(string key, bool defaultValue = false)
         {
             object result;
             if (_dict.TryGetValue(key, out result))
@@ -230,7 +226,7 @@ namespace LiteJSON
             return defaultValue;
         }
 
-        public string OptString(string key, string defaultValue)
+        public string OptString(string key, string defaultValue = "")
         {
             object result;
             if (_dict.TryGetValue(key, out result))
@@ -240,7 +236,7 @@ namespace LiteJSON
             return defaultValue;
         }
 
-        public float OptFloat(string key, float defaultValue)
+        public float OptFloat(string key, float defaultValue = 0f)
         {
             object result;
             if (_dict.TryGetValue(key, out result))
@@ -252,7 +248,7 @@ namespace LiteJSON
             return defaultValue;
         }
 
-        public double OptDouble(string key, double defaultValue)
+        public double OptDouble(string key, double defaultValue = 0.0)
         {
             object result;
             if (_dict.TryGetValue(key, out result))
@@ -282,74 +278,6 @@ namespace LiteJSON
                 return (JsonArray)result;
             }
             return null;
-        }
-
-        public int OptInt(string key)
-        {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                if (result is double)
-                    return (int)(double)result;
-                return (int)(long)result;
-            }
-            return 0;
-        }
-
-        public long OptLong(string key)
-        {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                if (result is double)
-                    return (long)(double)result;
-                return (long)result;
-            }
-            return 0;
-        }
-
-        public bool OptBool(string key)
-        {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                return (bool)result;
-            }
-            return false;
-        }
-
-        public string OptString(string key)
-        {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                return (string)result;
-            }
-            return string.Empty;
-        }
-
-        public float OptFloat(string key)
-        {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                if (result is long)
-                    return (long)result;
-                return (float)(double)result;
-            }
-            return 0f;
-        }
-
-        public double OptDouble(string key)
-        {
-            object result;
-            if (_dict.TryGetValue(key, out result))
-            {
-                if (result is long)
-                    return (long)result;
-                return (double)result;
-            }
-            return 0.0;
         }
     }
 }

@@ -139,45 +139,57 @@ namespace LiteJSON
             return null;
         }
 
-        public int OptInt(int index, int defaultValue)
+        public int OptInt(int index, int defaultValue = 0)
         {
             if (index >= 0 && index < _list.Count)
                 return (int)(long)_list[index];
             return defaultValue;
         }
 
-        public long OptLong(int index, long defaultValue)
+        public long OptLong(int index, long defaultValue = 0)
         {
             if (index >= 0 && index < _list.Count)
                 return (long)_list[index];
             return defaultValue;
         }
 
-        public bool OptBool(int index, bool defaultValue)
+        public bool OptBool(int index, bool defaultValue = false)
         {
             if (index >= 0 && index < _list.Count)
                 return (bool)_list[index];
             return defaultValue;
         }
 
-        public string OptString(int index, string defaultValue)
+        public string OptString(int index, string defaultValue = "")
         {
             if (index >= 0 && index < _list.Count)
                 return (string)_list[index];
             return defaultValue;
         }
 
-        public float OptFloat(int index, float defaultValue)
+        public float OptFloat(int index, float defaultValue = 0f)
         {
             if (index >= 0 && index < _list.Count)
-                return (float)(double)_list[index];
+            {
+                object value = _list[index];
+                if (value is long)
+                    return (long)value;
+                
+                return (float)(double)value;
+            }
             return defaultValue;
         }
 
-        public double OptDouble(int index, double defaultValue)
+        public double OptDouble(int index, double defaultValue = 0.0)
         {
             if (index >= 0 && index < _list.Count)
-                return (double)_list[index];
+            {
+                object value = _list[index];
+                if (value is long)
+                    return (long)value;
+
+                return (double)value;
+            }
             return defaultValue;
         }
 
@@ -193,48 +205,6 @@ namespace LiteJSON
             if (index >= 0 && index < _list.Count)
                 return (JsonArray)_list[index];
             return null;
-        }
-
-        public int OptInt(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (int)(long)_list[index];
-            return 0;
-        }
-
-        public long OptLong(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (long)_list[index];
-            return 0;
-        }
-
-        public bool OptBool(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (bool)_list[index];
-            return false;
-        }
-
-        public string OptString(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (string)_list[index];
-            return string.Empty;
-        }
-
-        public float OptFloat(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (float)(double)_list[index];
-            return float.NaN;
-        }
-
-        public double OptDouble(int index)
-        {
-            if (index >= 0 && index < _list.Count)
-                return (double)_list[index];
-            return double.NaN;
         }
 
         public T Deserialize<T>(int index) where T : IJsonDeserializable
