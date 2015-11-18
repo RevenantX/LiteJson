@@ -142,7 +142,7 @@ namespace LiteJSON
         public int OptInt(int index, int defaultValue)
         {
             if (index >= 0 && index < _list.Count)
-                return (int)_list[index];
+                return (int)(long)_list[index];
             return defaultValue;
         }
 
@@ -170,7 +170,7 @@ namespace LiteJSON
         public float OptFloat(int index, float defaultValue)
         {
             if (index >= 0 && index < _list.Count)
-                return (float)_list[index];
+                return (float)(double)_list[index];
             return defaultValue;
         }
 
@@ -198,7 +198,7 @@ namespace LiteJSON
         public int OptInt(int index)
         {
             if (index >= 0 && index < _list.Count)
-                return (int)_list[index];
+                return (int)(long)_list[index];
             return 0;
         }
 
@@ -226,7 +226,7 @@ namespace LiteJSON
         public float OptFloat(int index)
         {
             if (index >= 0 && index < _list.Count)
-                return (float)_list[index];
+                return (float)(double)_list[index];
             return float.NaN;
         }
 
