@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game.Shared.WeaponLogic;
 
 namespace LiteJSON
 {
@@ -286,32 +287,70 @@ namespace LiteJSON
 
         public int OptInt(string key)
         {
-            return OptInt(key, 0);
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                if (result is double)
+                    return (int)(double)result;
+                return (int)(long)result;
+            }
+            return 0;
         }
 
         public long OptLong(string key)
         {
-            return OptLong(key, 0L);
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                if (result is double)
+                    return (long)(double)result;
+                return (long)result;
+            }
+            return 0;
         }
 
         public bool OptBool(string key)
         {
-            return OptBool(key, false);
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (bool)result;
+            }
+            return false;
         }
 
         public string OptString(string key)
         {
-            return OptString(key, String.Empty);
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                return (string)result;
+            }
+            return string.Empty;
         }
 
         public float OptFloat(string key)
         {
-            return OptFloat(key, 0f);
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                if (result is long)
+                    return (long)result;
+                return (float)(double)result;
+            }
+            return 0f;
         }
 
         public double OptDouble(string key)
         {
-            return OptDouble(key, 0d);
+            object result;
+            if (_dict.TryGetValue(key, out result))
+            {
+                if (result is long)
+                    return (long)result;
+                return (double)result;
+            }
+            return 0.0;
         }
     }
 }
