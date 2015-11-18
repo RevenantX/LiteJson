@@ -3,4 +3,4 @@ syntax: glob
 LiteJSON/bin
 LiteJSON/obj
 *.suo
-
+packages/
