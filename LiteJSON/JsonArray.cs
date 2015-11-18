@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections;
 using System;
 
@@ -253,7 +253,15 @@ namespace LiteJSON
             List<int> result = new List<int>(count);
             for (int i = 0; i < count; i++)
             {
-                result.Add((int)_list[i]);
+                object current = _list[i];
+                int value;
+
+                if (current is long)
+                    value = (int)(long)current;
+                else
+                    value = (int)(double)current;
+
+                result.Add(value);
             }
             return result;
         }
@@ -267,10 +275,10 @@ namespace LiteJSON
                 object current = _list[i];
                 long value;
 
-                if (current is int)
-                    value = (int) current;
-                else
+                if (current is long)
                     value = (long) current;
+                else
+                    value = (long)(double) current;
                 
                 result.Add(value);
             }
@@ -308,10 +316,10 @@ namespace LiteJSON
                 object current = _list[i];
                 float value;
 
-                if (current is int)
-                    value = (int)current;
+                if (current is long)
+                    value = (long)current;
                 else
-                    value = (float)current;
+                    value = (float)(double)current;
 
                 result.Add(value);
             }
@@ -327,12 +335,10 @@ namespace LiteJSON
                 object current = _list[i];
                 double value;
 
-                if (current is int)
-                    value = (int)current;
-                else if (current is float)
-                    value = (float) current;
+                if (current is long)
+                    value = (long)current;
                 else
-                    value = (double)current;
+                    value = (double) current;
 
                 result.Add(value);
             }
@@ -361,7 +367,10 @@ namespace LiteJSON
             int[] result = new int[count];
             for (int i = 0; i < count; i++)
             {
-                result[i] = (int)(long)_list[i];
+                if (_list[i] is double)
+                    result[i] = (int)(double)_list[i];
+                else
+                    result[i] = (int)(long) _list[i];
             }
             return result;
         }
@@ -372,7 +381,10 @@ namespace LiteJSON
             long[] result = new long[count];
             for (int i = 0; i < count; i++)
             {
-                result[i] = (long)_list[i];
+                if (_list[i] is double)
+                    result[i] = (long) (double) _list[i];
+                else
+                    result[i] = (long)_list[i];
             }
             return result;
         }
@@ -405,7 +417,10 @@ namespace LiteJSON
             float[] result = new float[count];
             for (int i = 0; i < count; i++)
             {
-                result[i] = (float)(double)_list[i];
+                if (_list[i] is long)
+                    result[i] = (long) _list[i];
+                else
+                    result[i] = (float)(double) _list[i];
             }
             return result;
         }
@@ -416,7 +431,10 @@ namespace LiteJSON
             double[] result = new double[count];
             for (int i = 0; i < count; i++)
             {
-                result[i] = (double)_list[i];
+                if (_list[i] is long)
+                    result[i] = (long) _list[i];
+                else
+                    result[i] = (double) _list[i];
             }
             return result;
         }

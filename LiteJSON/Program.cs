@@ -117,6 +117,19 @@ namespace LiteJSON
             Console.WriteLine(jo.GetString("b"));
             Console.WriteLine(jo.GetString("c"));
 
+            //TEST4
+            string jtext2 = "{ a: [0.5, 0.3, 0.2, 1, 3], b: [1,2,3,4] }";
+            JsonObject jo2 = new JsonObject(jtext2);
+            var a1 = jo2.GetJsonArray("a").ToArrayDouble();
+            var a2 = jo2.GetJsonArray("a").ToArrayFloat();
+            var a3 = jo2.GetJsonArray("a").ToArrayInt();
+            var a4 = jo2.GetJsonArray("a").ToArrayLong();
+
+            var b1 = jo2.GetJsonArray("b").ToListDouble();
+            var b2 = jo2.GetJsonArray("b").ToListFloat();
+            var b3 = jo2.GetJsonArray("b").ToListInt();
+            var b4 = jo2.GetJsonArray("b").ToListLong();
+
             Console.ReadKey();
         }
     }
