@@ -247,7 +247,7 @@ namespace LiteJSON
             return new List<object>(_list);
         }
 
-        public List<int> ToListInt()
+        public List<int> ToListInt(bool castFloats = false)
         {
             int count = _list.Count;
             List<int> result = new List<int>(count);
@@ -256,17 +256,22 @@ namespace LiteJSON
                 object current = _list[i];
                 int value;
 
-                if (current is long)
-                    value = (int)(long)current;
+                if (current is double)
+                {
+                    if (castFloats)
+                        value = (int)(double)current;
+                    else
+                        throw new InvalidCastException();
+                }
                 else
-                    value = (int)(double)current;
+                    value = (int)(long)current;
 
                 result.Add(value);
             }
             return result;
         }
 
-        public List<long> ToListLong()
+        public List<long> ToListLong(bool castFloats = false)
         {
             int count = _list.Count;
             List<long> result = new List<long>(count);
@@ -275,10 +280,15 @@ namespace LiteJSON
                 object current = _list[i];
                 long value;
 
-                if (current is long)
-                    value = (long) current;
+                if (current is double)
+                {
+                    if (castFloats)
+                        value = (long)(double)current;
+                    else
+                        throw new InvalidCastException();
+                }
                 else
-                    value = (long)(double) current;
+                    value = (long)current;
                 
                 result.Add(value);
             }
@@ -361,28 +371,38 @@ namespace LiteJSON
             return _list.ToArray();
         }
 
-        public int[] ToArrayInt()
+        public int[] ToArrayInt(bool castFloats = false)
         {
             int count = _list.Count;
             int[] result = new int[count];
             for (int i = 0; i < count; i++)
             {
                 if (_list[i] is double)
-                    result[i] = (int)(double)_list[i];
+                {
+                    if(castFloats)
+                        result[i] = (int) (double) _list[i];
+                    else
+                        throw new InvalidCastException();
+                }
                 else
-                    result[i] = (int)(long) _list[i];
+                    result[i] = (int) (long) _list[i];
             }
             return result;
         }
 
-        public long[] ToArrayLong()
+        public long[] ToArrayLong(bool castFloats = false)
         {
             int count = _list.Count;
             long[] result = new long[count];
             for (int i = 0; i < count; i++)
             {
                 if (_list[i] is double)
-                    result[i] = (long) (double) _list[i];
+                {
+                    if (castFloats)
+                        result[i] = (long)(double)_list[i];
+                    else
+                        throw new InvalidCastException();
+                }
                 else
                     result[i] = (long)_list[i];
             }
