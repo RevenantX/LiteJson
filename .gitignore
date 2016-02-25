@@ -1,4 +1,3 @@
-syntax: glob
 *.userprefs
 LiteJSON/bin
 LiteJSON/obj
